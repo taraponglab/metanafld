@@ -1,0 +1,32 @@
+,source,target,weight
+0,Cholic acid,Diosgenin,0.7777777777777778
+1,Cholic acid,Exendin,0.5230769230769231
+2,Cholic acid,Liraglutide,0.6865671641791045
+3,Acetaminophen,Bisphenol A,0.3333333333333333
+4,Tyloxapol,Bisphenol A,0.5416666666666666
+5,Palmitoleic acid,Oleic acid,1.0
+6,Palmitoleic acid,10-nitro-octadec-9-enoic acid,0.5714285714285714
+7,Palmitoleic acid,Gallic acid,0.3157894736842105
+8,Oleic acid,10-nitro-octadec-9-enoic acid,0.5714285714285714
+9,Oleic acid,Gallic acid,0.3157894736842105
+10,PCB 126,Aroclor 1260,0.3333333333333333
+11,Streptozotocin,Glucose,0.40540540540540543
+12,Methionine,Monosodium glutamate,0.3125
+13,Orotic acid,Chlorogenic acid,0.3103448275862069
+14,Sucrose,Glucose,0.4
+15,Diosgenin,Exendin,0.6666666666666666
+16,Diosgenin,Liraglutide,0.5352112676056338
+17,Atorvastatin,Sodium Butyrate,0.5759162303664922
+18,Exendin,Liraglutide,0.4
+19,Geniposide,Curcumin,1.0
+20,Geniposide,Quercetin,0.3333333333333333
+21,Geniposide,Naringenin,0.4915254237288136
+22,Silybin,Taurine,0.3103448275862069
+23,Curcumin,Quercetin,0.3333333333333333
+24,Curcumin,Naringenin,0.4915254237288136
+25,Silymarin,Quercetin,0.43103448275862066
+26,Bavachinin,pioglitazone,1.0
+27,Lipoic acid,Quercetin,0.3103448275862069
+28,Lipoic acid,Naringenin,0.4339622641509434
+29,Allopurinol,Dihydromyricetin,0.43478260869565216
+30,Quercetin,Naringenin,0.4166666666666667
