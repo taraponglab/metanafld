@@ -1,20 +1,5 @@
 ,source,target,weight
-0,Cholic acid,Ursodexycholic acid,0.7777777777777778
-1,Cholic acid,Obeticholic acid,0.5230769230769231
-2,Cholic acid,Aramchol,0.6865671641791045
-3,Tyloxapol,BPA,0.5416666666666666
-4,Palmitoleic acid,Oleic acid,1.0
-5,Palmitoleic acid,10-nitrooleic acid,0.5714285714285714
-6,Oleic acid,10-nitrooleic acid,0.5714285714285714
-7,Streptozotocin,Glucose,0.40540540540540543
-8,Ursodexycholic acid,Obeticholic acid,0.6666666666666666
-9,Ursodexycholic acid,Aramchol,0.5352112676056338
-10,Exendin,Liraglutide,0.5759162303664922
-11,Silybin,Silymarin,1.0
-12,Silybin,Dihydromyricetin,0.4915254237288136
-13,Silymarin,Dihydromyricetin,0.4915254237288136
-14,Bavachinin,Naringenin,0.43103448275862066
-15,Pioglitazone,Dimethoxycoumarin,1.0
-16,Epigallocatechin gallate,Dihydromyricetin,0.4339622641509434
-17,Quercetin,Chrysin,0.43478260869565216
-18,Naringenin,Dihydromyricetin,0.4166666666666667
+0,Cholic acid,Aramchol,0.4095238095238095
+1,Palmitoleic acid,Oleic acid,0.6962025316455697
+2,Silybin,Silymarin,1.0
+3,Pioglitazone,Dimethoxycoumarin,1.0
