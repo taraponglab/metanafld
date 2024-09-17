@@ -56,7 +56,7 @@ Curcumin,COc1cc(/C=C/C(=O)CC(=O)/C=C/c2ccc(O)c(OC)c2)ccc1O,Inhibitor,Lipogenesis
 Silymarin,COc1cc(C2Oc3cc(C4Oc5cc(O)cc(O)c5C(=O)C4O)ccc3OC2CO)ccc1O,Inhibitor,Oxidative stress,Natural products
 Bavachinin,COc1cc2c(cc1CC=C(C)C)C(=O)C[C@@H](c1ccc(O)cc1)O2,Inhibitor,Inflammation,Natural products
 Pioglitazone,COc1cc2ccc(=O)oc2cc1OC,Inhibitor,Lipogenesis,Drugs
-"6,7-Dimethoxycoumarin ",COc1cc2ccc(=O)oc2cc1OC,Inhibitor,Inflammation,Natural products
+Dimethoxycoumarin,COc1cc2ccc(=O)oc2cc1OC,Inhibitor,Inflammation,Natural products
 Melatonin,COc1ccc2[nH]cc(CCNC(C)=O)c2c1,Inhibitor,Lipogenesis,Hormones
 Berberine,COc1ccc2cc3[n+](cc2c1OC)CCc1cc2c(cc1-3)OCO2,Inhibitor,Lipogenesis,Natural products
 Sulforaphane,CS(=O)CCCCN=C=S,Inhibitor,Lipogenesis,Natural products
