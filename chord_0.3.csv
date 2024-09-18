@@ -1,10 +1,32 @@
 ,source,target,weight
-0,Cholic acid,Ursodexycholic acid,0.3691275167785235
-1,Cholic acid,Aramchol,0.4095238095238095
-2,Tyloxapol,BPA,0.36585365853658536
-3,Palmitoleic acid,Oleic acid,0.6962025316455697
-4,Ursodexycholic acid,Obeticholic acid,0.37333333333333335
-5,Silybin,Silymarin,1.0
-6,Silybin,Dihydromyricetin,0.3103448275862069
-7,Silymarin,Dihydromyricetin,0.3103448275862069
-8,Pioglitazone,Dimethoxycoumarin,1.0
+0,Cholic acid,Ursodexycholic acid,0.7777777777777778
+1,Cholic acid,Obeticholic acid,0.5230769230769231
+2,Cholic acid,Aramchol,0.6865671641791045
+3,Acetaminophen,BPA,0.3333333333333333
+4,Tyloxapol,BPA,0.5416666666666666
+5,Palmitoleic acid,Oleic acid,1.0
+6,Palmitoleic acid,10-nitrooleic acid,0.5714285714285714
+7,Palmitoleic acid,Lipoic acid,0.3157894736842105
+8,Oleic acid,10-nitrooleic acid,0.5714285714285714
+9,Oleic acid,Lipoic acid,0.3157894736842105
+10,PCB 126,Aroclor 1260,0.3333333333333333
+11,Streptozotocin,Glucose,0.40540540540540543
+12,Methionine,MSG,0.3125
+13,Orotic acid,Gallic acid,0.3103448275862069
+14,Sucrose,Glucose,0.4
+15,Ursodexycholic acid,Obeticholic acid,0.6666666666666666
+16,Ursodexycholic acid,Aramchol,0.5352112676056338
+17,Exendin,Liraglutide,0.5759162303664922
+18,Obeticholic acid,Aramchol,0.4
+19,Rosiglitazone,Pioglitazone,0.5245901639344263
+20,Silibinin,Silymarin,1.0
+21,Silibinin,Naringenin,0.3333333333333333
+22,Silibinin,Dihydromyricetin,0.4915254237288136
+23,Curcumin,Chlorogenic acid,0.3103448275862069
+24,Silymarin,Naringenin,0.3333333333333333
+25,Silymarin,Dihydromyricetin,0.4915254237288136
+26,Bavachinin,Naringenin,0.43103448275862066
+27,Epigallocatechin gallate,Naringenin,0.3103448275862069
+28,Epigallocatechin gallate,Dihydromyricetin,0.4339622641509434
+29,Quercetin,Chrysin,0.43478260869565216
+30,Naringenin,Dihydromyricetin,0.4166666666666667
