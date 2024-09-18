@@ -63,7 +63,6 @@ Berberine,COc1ccc2cc3[n+](cc2c1OC)CCc1cc2c(cc1-3)OCO2,Inhibitor,1.5,Lipogenesis,
 Sulforaphane,CS(=O)CCCCN=C=S,Inhibitor,10,Lipogenesis,Natural products,five week old male albino Wistar rats ,4 weeks,oral,"FAS, PPARα, and AMPK ",10.1007/s12192-022-01286-w
 Elafibranor,CSc1ccc(C(=O)/C=C/c2cc(C)c(OC(C)(C)C(=O)O)c(C)c2)cc1,Inhibitor,10,Fibrosis,Natural products,12 week old Male C57BL/6 mice,4 weeks,oral,"α-SMA, PPARβ and COL1A1",10.1016/j.biopha.2023.115623
 Gemigliptin,N[C@@H](CC(=O)N1CCc2c(nc(C(F)(F)F)nc2C(F)(F)F)C1)CN1CC(F)(F)CCC1=O,Inhibitor,400,Fibrosis,Drugs,Four-week-old male C57BL/6N mice,8 weeks,oral,"TNFα, IL-1β, collagen type 1 and α-SMA",10.3803/EnM.2022.1530
-Cordyceps militaris,Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO)C[C@H]1O,Inhibitor,"100, 300",Lipogenesis,Natural products,C57BL/6N male wild-type mice,8 weeks,oral,"ACC, FAS, Cpt1, Acox1, Il-1β, Ccl2, and Ccl5",10.3390/nu11122963
 Taurine,NCCS(=O)(=O)O,Inhibitor,400,Inflammation,Amino acids,8 week old male Sprague-Dawley rats ,16 weeks,oral,"IL-17, IL-10",10.2147/DMSO.S440978
 Chlorogenic acid,O=C(/C=C/c1ccc(O)c(O)c1)O[C@@H]1C[C@](O)(C(=O)O)C[C@@H](O)[C@H]1O,Inhibitor,1.34 ,Inflammation,Natural products,24 six-week-old male C57BL/6 mice,5 weeks,drink,"IL-1α, IL-1β, IL-6, MCP-1, GM-CSF, and TNF-α",10.1155/2021/6615881
 Gallic acid,C1=C(C=C(C(=C1O)O)O)C(=O)O,Inhibitor,100,Oxidative stress,Natural products,Adult male Wistar rats,three days a week for 6 weeks,oral,"NF-Kβ, TNF-α, IL-6, Nrf2, HO1 and miRs122, and 34a.",10.22038/AJP.2021.17835
