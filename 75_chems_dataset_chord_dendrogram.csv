@@ -9,8 +9,8 @@ BPA,CC(C)(c1ccc(O)cc1)c1ccc(O)cc1,Inducer,Lipogenesis,Chemicals
 Thioacetamide,CC(N)=S,Inducer,Fibrosis,Chemicals
 Tamoxifen,CC/C(=C(\c1ccccc1)c1ccc(OCCN(C)C)cc1)c1ccccc1,Inducer,Fibrosis,Drugs
 Olanzapine,Cc1cc2c(s1)Nc1ccccc1N=C2N1CCN(C)CC1,Inducer,Lipogenesis,Drugs
-Palmitoleic acid,CCCCCC/C=C\CCCCCCCC(=O)O,Inducer,Lipogenesis,Fatty acids
-Oleic acid,CCCCCCCC/C=C\CCCCCCCC(=O)O,Inducer,Lipogenesis,Fatty acids
+Palmitoleic acid,CCCCCC/C=C\CCCCCCCC(=O)O,Inhibitor,Lipogenesis,Fatty acids
+Oleic acid,CCCCCCCC/C=C\CCCCCCCC(=O)O,Inhibitor,Lipogenesis,Fatty acids
 10-nitrooleic acid,CCCCCCCCC(=CCCCCCCCC(=O)O)[N+](=O)[O-],Inducer,Lipogenesis,Fatty acids
 LPS,CCCCCCCCCCCCCC(=O)O[C@H](CCCCCCCCCCC)CC(=O)O[C@@H]1[C@@H](NC(=O)C[C@@H](CCCCCCCCCCC)OC(=O)CCCCCCCCCCC)[C@H](OC[C@H]2O[C@H](OP(=O)(O)O)[C@H](NC(=O)C[C@H](O)CCCCCCCCCCC)[C@@H](OC(=O)C[C@H](O)CCCCCCCCCCC)[C@@H]2O)O[C@H](CO[C@]2(C(=O)O)C[C@@H](O[C@]3(C(=O)O)C[C@@H](O[C@]4(C(=O)O)C[C@@H](OP(=O)(O)OCCN)[C@H](O)[C@@H]([C@@H](O)CO)O4)[C@H](O)[C@@H]([C@@H](O)CO)O3)[C@H](OC3O[C@H]([C@@H](O)CO)[C@@H](OP(=O)(O)OP(=O)(O)OCCN)[C@H](OC4O[C@H]([C@@H](O)COC5O[C@H]([C@@H](O)CO)[C@@H](OP(=O)(O)O)[C@H](O)[C@@H]5O)[C@@H](O)[C@H](OC5O[C@H](CO[C@H]6O[C@H](CO)[C@H](O)[C@H](O)[C@H]6O)[C@@H](O)[C@H](O[C@H]6O[C@H](CO)[C@H](O)[C@H](O)[C@H]6OC6O[C@H](CO)[C@@H](O)[C@H](O)[C@H]6O[C@@H]6O[C@H](CO)[C@@H](O)[C@H](O)[C@H]6NC(C)=O)[C@H]5O)[C@@H]4O)[C@@H]3O)[C@@H]([C@@H](O)CO)O2)[C@H]1OP(=O)(O)O,Inducer,Lipogenesis,Toxins
 Diethylnitrosamine,CCN(CC)N=O,Inducer,Inflammation,Chemicals
@@ -63,7 +63,7 @@ Gemigliptin,N[C@@H](CC(=O)N1CCc2c(nc(C(F)(F)F)nc2C(F)(F)F)C1)CN1CC(F)(F)CCC1=O,I
 Taurine,NCCS(=O)(=O)O,Inhibitor,Inflammation,Amino acids
 Chlorogenic acid,O=C(/C=C/c1ccc(O)c(O)c1)O[C@@H]1C[C@](O)(C(=O)O)C[C@@H](O)[C@H]1O,Inhibitor,Inflammation,Natural products
 Gallic acid,C1=C(C=C(C(=C1O)O)O)C(=O)O,Inhibitor,Oxidative stress,Natural products
-Lipoic acid,O=C(O)CCCC[C@@H]1CCSS1,Inhibitor,Oxidative stress,Metabolites
+Lipoic acid,O=C(O)CCCC[C@@H]1CCSS1,Inducer,Oxidative stress,Metabolites
 Epigallocatechin gallate,O=C(O[C@@H]1Cc2c(O)cc(O)cc2O[C@@H]1c1cc(O)c(O)c(O)c1)c1cc(O)c(O)c(O)c1,Inhibitor,Inflammation,Natural products
 Allopurinol,O=c1[nH]cnc2[nH]ncc12,Inhibitor,Lipogenesis,Drugs
 Quercetin,O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12,Inhibitor,Lipogenesis,Natural products
