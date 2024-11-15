@@ -1,0 +1,37 @@
+Name,canonical_smiles
+Thioacetamide,CC(N)=S
+Palmitoleic acid,CCCCCC/C=C\CCCCCCCC(=O)O
+Oleic acid,CCCCCCCC/C=C\CCCCCCCC(=O)O
+10-nitrooleic acid,CCCCCCCCC(=CCCCCCCCC(=O)O)[N+](=O)[O-]
+Diethylnitrosamine,CCN(CC)N=O
+Carbon tetrachloride,ClC(Cl)(Cl)Cl
+Methionine,CSCC[C@H](N)C(=O)O
+MSG,N[C@@H](CCC(=O)O)C(=O)[O-].[Na+]
+PFOS,C(C(C(C(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(C(C(C(F)(F)F)(F)F)(F)F)(F)F
+Alanyl-glutamine,C[C@H](N)C(=O)N[C@@H](CCC(N)=O)C(=O)O
+TMAO,C[N+](C)(C)[O-]
+Sodium Butyrate,CCCC(=O)[O-].[Na+]
+Metformin,CN(C)C(=N)N=C(N)N
+Sulforaphane,CS(=O)CCCCN=C=S
+Taurine,NCCS(=O)(=O)O
+Clodronate,O=P(O)(O)C(Cl)(Cl)P(=O)(O)O
+T0901317,O=S(=O)(c1ccccc1)N(CC(F)(F)F)c1ccc(C(O)(C(F)(F)F)C(F)(F)F)cc1
+Rapamycin,O[C@H]1[C@H](OC)C[C@H](C[C@@H](C)[C@H](CC([C@H](C)/C=C(C)/[C@H]([C@@H](OC)C([C@@H](C[C@@H](/C=C/C=C/C=C(C)/[C@@H](OC)C[C@@H]2CC[C@@H](C)[C@@](C(C(N3[C@H]4CCCC3)=O)=O)(O)O2)C)C)=O)O)=O)OC4=O)CC1
+Bavachinin,COc1cc2c(cc1CC=C(C)C)C(=O)C[C@@H](c1ccc(O)cc1)O2
+Naringenin,O=C1C[C@@H](c2ccc(O)cc2)Oc2cc(O)cc(O)c21
+Dihydromyricetin,O=C1c2c(O)cc(O)cc2O[C@H](c2cc(O)c(O)c(O)c2)[C@H]1O
+Elafibranor,CSc1ccc(C(=O)/C=C/c2cc(C)c(OC(C)(C)C(=O)O)c(C)c2)cc1
+TCDD,Clc1cc2c(cc1Cl)Oc1cc(Cl)c(Cl)cc1O2
+Rosiglitazone,CN(CCOc1ccc(CC2SC(=O)NC2=O)cc1)c1ccccn1
+Citicoline,C[N+](C)(C)CCOP(=O)([O-])OP(=O)(O)OC[C@H]1O[C@@H](n2ccc(N)nc2=O)[C@H](O)[C@@H]1O
+Gemigliptin,N[C@@H](CC(=O)N1CCc2c(nc(C(F)(F)F)nc2C(F)(F)F)C1)CN1CC(F)(F)CCC1=O
+Geniposide,COC(=O)C1=CO[C@@H](O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@@H]2C(CO)=CC[C@H]12
+Scoparone,COc1cc2ccc(=O)oc2cc1OC
+Berberine,COc1ccc2cc3[n+](cc2c1OC)CCc1cc2c(cc1-3)OCO2
+Tamoxifen,CC/C(=C(\c1ccccc1)c1ccc(OCCN(C)C)cc1)c1ccccc1
+PCB 126,Clc1ccc(-c2cc(Cl)c(Cl)c(Cl)c2)cc1Cl
+Aroclor 1260,Clc1ccc(-c2ccc(Cl)c(Cl)c2Cl)c(Cl)c1Cl
+Tetracycline,CN(C)[C@@H]1C(=O)C(C(N)=O)=C(O)[C@@]2(O)C(=O)C3=C(O)c4c(O)cccc4[C@@](C)(O)[C@H]3C[C@@H]12
+Streptozotocin,CN(N=O)C(=O)N[C@@H]1[C@@H](O)[C@H](O)[C@@H](CO)O[C@@H]1O
+Glucose,OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O
+Fructose,OCC1(O)OC[C@@H](O)[C@@H](O)[C@@H]1O
