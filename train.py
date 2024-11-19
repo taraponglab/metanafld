@@ -219,104 +219,104 @@ def stacked_class(name):
     ysc_pred_xgb_cv,    ysc_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
     yac_pred_xgb_cv,    yac_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
     yma_pred_xgb_cv,    yma_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
-    baseline_model_lr_at = LogisticRegressionCV(max_iter=100, cv=5).fit(xat_train, y_train) #5 50 100
-    baseline_model_lr_ke = LogisticRegressionCV(max_iter=100, cv=5).fit(xke_train, y_train)
-    baseline_model_lr_es = LogisticRegressionCV(max_iter=100, cv=5).fit(xes_train, y_train)
-    baseline_model_lr_pc = LogisticRegressionCV(max_iter=100, cv=5).fit(xpc_train, y_train)
-    baseline_model_lr_ss = LogisticRegressionCV(max_iter=100, cv=5).fit(xss_train, y_train)
-    baseline_model_lr_cd = LogisticRegressionCV(max_iter=100, cv=5).fit(xcd_train, y_train)
-    baseline_model_lr_cn = LogisticRegressionCV(max_iter=100, cv=5).fit(xcn_train, y_train) #500
-    baseline_model_lr_kc = LogisticRegressionCV(max_iter=100, cv=5).fit(xkc_train, y_train)
-    baseline_model_lr_ce = LogisticRegressionCV(max_iter=100, cv=5).fit(xce_train, y_train)
-    baseline_model_lr_sc = LogisticRegressionCV(max_iter=100, cv=5).fit(xsc_train, y_train)
-    baseline_model_lr_ac = LogisticRegressionCV(max_iter=100, cv=5).fit(xac_train, y_train)
-    baseline_model_lr_ma = LogisticRegressionCV(max_iter=100, cv=5).fit(xma_train, y_train)
-    dump(baseline_model_lr_at, os.path.join(name,"train", "baseline_model_lr_at.joblib"))
-    dump(baseline_model_lr_ke, os.path.join(name,"train", "baseline_model_lr_ke.joblib"))
-    dump(baseline_model_lr_es, os.path.join(name,"train", "baseline_model_lr_es.joblib"))
-    dump(baseline_model_lr_pc, os.path.join(name,"train", "baseline_model_lr_pc.joblib"))
-    dump(baseline_model_lr_ss, os.path.join(name,"train", "baseline_model_lr_ss.joblib"))
-    dump(baseline_model_lr_cd, os.path.join(name,"train", "baseline_model_lr_cd.joblib"))
-    dump(baseline_model_lr_cn, os.path.join(name,"train", "baseline_model_lr_cn.joblib"))
-    dump(baseline_model_lr_kc, os.path.join(name,"train", "baseline_model_lr_kc.joblib"))
-    dump(baseline_model_lr_ce, os.path.join(name,"train", "baseline_model_lr_ce.joblib"))
-    dump(baseline_model_lr_sc, os.path.join(name,"train", "baseline_model_lr_sc.joblib"))
-    dump(baseline_model_lr_ac, os.path.join(name,"train", "baseline_model_lr_ac.joblib"))
-    dump(baseline_model_lr_ma, os.path.join(name,"train", "baseline_model_lr_ma.joblib"))
-    yat_pred_lr_train, yat_metric_lr_train = y_prediction(   baseline_model_lr_at, xat_train, y_train, "yat_pred_lr")
-    yes_pred_lr_train, yes_metric_lr_train = y_prediction(   baseline_model_lr_es, xes_train, y_train, "yes_pred_lr")
-    yke_pred_lr_train, yke_metric_lr_train = y_prediction(   baseline_model_lr_ke, xke_train, y_train, "yke_pred_lr")
-    ypc_pred_lr_train, ypc_metric_lr_train = y_prediction(   baseline_model_lr_pc, xpc_train, y_train, "ypc_pred_lr")
-    yss_pred_lr_train, yss_metric_lr_train = y_prediction(   baseline_model_lr_ss, xss_train, y_train, "yss_pred_lr")
-    ycd_pred_lr_train, ycd_metric_lr_train = y_prediction(   baseline_model_lr_cd, xcd_train, y_train, "ycd_pred_lr")
-    ycn_pred_lr_train, ycn_metric_lr_train = y_prediction(   baseline_model_lr_cn, xcn_train, y_train, "ycn_pred_lr")
-    ykc_pred_lr_train, ykc_metric_lr_train = y_prediction(   baseline_model_lr_kc, xkc_train, y_train, "ykc_pred_lr")
-    yce_pred_lr_train, yce_metric_lr_train = y_prediction(   baseline_model_lr_ce, xce_train, y_train, "yce_pred_lr")
-    ysc_pred_lr_train, ysc_metric_lr_train = y_prediction(   baseline_model_lr_sc, xsc_train, y_train, "ysc_pred_lr")
-    yac_pred_lr_train, yac_metric_lr_train = y_prediction(   baseline_model_lr_ac, xac_train, y_train, "yac_pred_lr")
-    yma_pred_lr_train, yma_metric_lr_train = y_prediction(   baseline_model_lr_ma, xma_train, y_train, "yma_pred_lr")
-    yat_pred_lr_test,  yat_metric_lr_test   = y_prediction(  baseline_model_lr_at, xat_test, y_test,   "yat_pred_lr")
-    yes_pred_lr_test,  yes_metric_lr_test   = y_prediction(  baseline_model_lr_es, xes_test, y_test,   "yes_pred_lr")
-    yke_pred_lr_test,  yke_metric_lr_test   = y_prediction(  baseline_model_lr_ke, xke_test, y_test,   "yke_pred_lr")
-    ypc_pred_lr_test,  ypc_metric_lr_test   = y_prediction(  baseline_model_lr_pc, xpc_test, y_test,   "ypc_pred_lr")
-    yss_pred_lr_test,  yss_metric_lr_test   = y_prediction(  baseline_model_lr_ss, xss_test, y_test,   "yss_pred_lr")
-    ycd_pred_lr_test,  ycd_metric_lr_test   = y_prediction(  baseline_model_lr_cd, xcd_test, y_test,   "ycd_pred_lr")
-    ycn_pred_lr_test,  ycn_metric_lr_test   = y_prediction(  baseline_model_lr_cn, xcn_test, y_test,   "ycn_pred_lr")
-    ykc_pred_lr_test,  ykc_metric_lr_test   = y_prediction(  baseline_model_lr_kc, xkc_test, y_test,   "ykc_pred_lr")
-    yce_pred_lr_test,  yce_metric_lr_test   = y_prediction(  baseline_model_lr_ce, xce_test, y_test,   "yce_pred_lr")
-    ysc_pred_lr_test,  ysc_metric_lr_test   = y_prediction(  baseline_model_lr_sc, xsc_test, y_test,   "ysc_pred_lr")
-    yac_pred_lr_test,  yac_metric_lr_test   = y_prediction(  baseline_model_lr_ac, xac_test, y_test,   "yac_pred_lr")
-    yma_pred_lr_test,  yma_metric_lr_test   = y_prediction(  baseline_model_lr_ma, xma_test, y_test,   "yma_pred_lr")
-    yat_pred_lr_cv,    yat_metric_lr_cv    = y_prediction_cv(baseline_model_lr_at, xat_train, y_train, "yat_pred_lr")
-    yes_pred_lr_cv,    yes_metric_lr_cv    = y_prediction_cv(baseline_model_lr_es, xes_train, y_train, "yes_pred_lr")
-    yke_pred_lr_cv,    yke_metric_lr_cv    = y_prediction_cv(baseline_model_lr_ke, xke_train, y_train, "yke_pred_lr")
-    ypc_pred_lr_cv,    ypc_metric_lr_cv    = y_prediction_cv(baseline_model_lr_pc, xpc_train, y_train, "ypc_pred_lr")
-    yss_pred_lr_cv,    yss_metric_lr_cv    = y_prediction_cv(baseline_model_lr_ss, xss_train, y_train, "yss_pred_lr")
-    ycd_pred_lr_cv,    ycd_metric_lr_cv    = y_prediction_cv(baseline_model_lr_cd, xcd_train, y_train, "ycd_pred_lr")
-    ycn_pred_lr_cv,    ycn_metric_lr_cv    = y_prediction_cv(baseline_model_lr_cn, xcn_train, y_train, "ycn_pred_lr")
-    ykc_pred_lr_cv,    ykc_metric_lr_cv    = y_prediction_cv(baseline_model_lr_kc, xkc_train, y_train, "ykc_pred_lr")
-    yce_pred_lr_cv,    yce_metric_lr_cv    = y_prediction_cv(baseline_model_lr_ce, xce_train, y_train, "yce_pred_lr")
-    ysc_pred_lr_cv,    ysc_metric_lr_cv    = y_prediction_cv(baseline_model_lr_sc, xsc_train, y_train, "ysc_pred_lr")
-    yac_pred_lr_cv,    yac_metric_lr_cv    = y_prediction_cv(baseline_model_lr_ac, xac_train, y_train, "yac_pred_lr")
-    yma_pred_lr_cv,    yma_metric_lr_cv    = y_prediction_cv(baseline_model_lr_ma, xma_train, y_train, "yma_pred_lr")
+    baseline_model_svc_at = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xat_train, y_train)
+    baseline_model_svc_ke = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xke_train, y_train)
+    baseline_model_svc_es = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xes_train, y_train)
+    baseline_model_svc_pc = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xpc_train, y_train)
+    baseline_model_svc_ss = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xss_train, y_train)
+    baseline_model_svc_cd = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xcd_train, y_train)
+    baseline_model_svc_cn = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xcn_train, y_train) #500
+    baseline_model_svc_kc = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xkc_train, y_train)
+    baseline_model_svc_ce = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xce_train, y_train)
+    baseline_model_svc_sc = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xsc_train, y_train)
+    baseline_model_svc_ac = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xac_train, y_train)
+    baseline_model_svc_ma = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xma_train, y_train)
+    dump(baseline_model_svc_at, os.path.join(name,"train", "baseline_model_lr_at.joblib"))
+    dump(baseline_model_svc_ke, os.path.join(name,"train", "baseline_model_lr_ke.joblib"))
+    dump(baseline_model_svc_es, os.path.join(name,"train", "baseline_model_lr_es.joblib"))
+    dump(baseline_model_svc_pc, os.path.join(name,"train", "baseline_model_lr_pc.joblib"))
+    dump(baseline_model_svc_ss, os.path.join(name,"train", "baseline_model_lr_ss.joblib"))
+    dump(baseline_model_svc_cd, os.path.join(name,"train", "baseline_model_lr_cd.joblib"))
+    dump(baseline_model_svc_cn, os.path.join(name,"train", "baseline_model_lr_cn.joblib"))
+    dump(baseline_model_svc_kc, os.path.join(name,"train", "baseline_model_lr_kc.joblib"))
+    dump(baseline_model_svc_ce, os.path.join(name,"train", "baseline_model_lr_ce.joblib"))
+    dump(baseline_model_svc_sc, os.path.join(name,"train", "baseline_model_lr_sc.joblib"))
+    dump(baseline_model_svc_ac, os.path.join(name,"train", "baseline_model_lr_ac.joblib"))
+    dump(baseline_model_svc_ma, os.path.join(name,"train", "baseline_model_lr_ma.joblib"))
+    yat_pred_svc_train, yat_metric_svc_train = y_prediction(   baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
+    yes_pred_svc_train, yes_metric_svc_train = y_prediction(   baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
+    yke_pred_svc_train, yke_metric_svc_train = y_prediction(   baseline_model_svc_ke, xke_train, y_train, "yke_pred_svc")
+    ypc_pred_svc_train, ypc_metric_svc_train = y_prediction(   baseline_model_svc_pc, xpc_train, y_train, "ypc_pred_svc")
+    yss_pred_svc_train, yss_metric_svc_train = y_prediction(   baseline_model_svc_ss, xss_train, y_train, "yss_pred_svc")
+    ycd_pred_svc_train, ycd_metric_svc_train = y_prediction(   baseline_model_svc_cd, xcd_train, y_train, "ycd_pred_svc")
+    ycn_pred_svc_train, ycn_metric_svc_train = y_prediction(   baseline_model_svc_cn, xcn_train, y_train, "ycn_pred_svc")
+    ykc_pred_svc_train, ykc_metric_svc_train = y_prediction(   baseline_model_svc_kc, xkc_train, y_train, "ykc_pred_svc")
+    yce_pred_svc_train, yce_metric_svc_train = y_prediction(   baseline_model_svc_ce, xce_train, y_train, "yce_pred_svc")
+    ysc_pred_svc_train, ysc_metric_svc_train = y_prediction(   baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
+    yac_pred_svc_train, yac_metric_svc_train = y_prediction(   baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
+    yma_pred_svc_train, yma_metric_svc_train = y_prediction(   baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
+    yat_pred_svc_test,  yat_metric_svc_test   = y_prediction(  baseline_model_svc_at, xat_test, y_test,   "yat_pred_svc")
+    yes_pred_svc_test,  yes_metric_svc_test   = y_prediction(  baseline_model_svc_es, xes_test, y_test,   "yes_pred_svc")
+    yke_pred_svc_test,  yke_metric_svc_test   = y_prediction(  baseline_model_svc_ke, xke_test, y_test,   "yke_pred_svc")
+    ypc_pred_svc_test,  ypc_metric_svc_test   = y_prediction(  baseline_model_svc_pc, xpc_test, y_test,   "ypc_pred_svc")
+    yss_pred_svc_test,  yss_metric_svc_test   = y_prediction(  baseline_model_svc_ss, xss_test, y_test,   "yss_pred_svc")
+    ycd_pred_svc_test,  ycd_metric_svc_test   = y_prediction(  baseline_model_svc_cd, xcd_test, y_test,   "ycd_pred_svc")
+    ycn_pred_svc_test,  ycn_metric_svc_test   = y_prediction(  baseline_model_svc_cn, xcn_test, y_test,   "ycn_pred_svc")
+    ykc_pred_svc_test,  ykc_metric_svc_test   = y_prediction(  baseline_model_svc_kc, xkc_test, y_test,   "ykc_pred_svc")
+    yce_pred_svc_test,  yce_metric_svc_test   = y_prediction(  baseline_model_svc_ce, xce_test, y_test,   "yce_pred_svc")
+    ysc_pred_svc_test,  ysc_metric_svc_test   = y_prediction(  baseline_model_svc_sc, xsc_test, y_test,   "ysc_pred_svc")
+    yac_pred_svc_test,  yac_metric_svc_test   = y_prediction(  baseline_model_svc_ac, xac_test, y_test,   "yac_pred_svc")
+    yma_pred_svc_test,  yma_metric_svc_test   = y_prediction(  baseline_model_svc_ma, xma_test, y_test,   "yma_pred_svc")
+    yat_pred_svc_cv,    yat_metric_svc_cv    = y_prediction_cv(baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
+    yes_pred_svc_cv,    yes_metric_svc_cv    = y_prediction_cv(baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
+    yke_pred_svc_cv,    yke_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ke, xke_train, y_train, "yke_pred_svc")
+    ypc_pred_svc_cv,    ypc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_pc, xpc_train, y_train, "ypc_pred_svc")
+    yss_pred_svc_cv,    yss_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ss, xss_train, y_train, "yss_pred_svc")
+    ycd_pred_svc_cv,    ycd_metric_svc_cv    = y_prediction_cv(baseline_model_svc_cd, xcd_train, y_train, "ycd_pred_svc")
+    ycn_pred_svc_cv,    ycn_metric_svc_cv    = y_prediction_cv(baseline_model_svc_cn, xcn_train, y_train, "ycn_pred_svc")
+    ykc_pred_svc_cv,    ykc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_kc, xkc_train, y_train, "ykc_pred_svc")
+    yce_pred_svc_cv,    yce_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ce, xce_train, y_train, "yce_pred_svc")
+    ysc_pred_svc_cv,    ysc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
+    yac_pred_svc_cv,    yac_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
+    yma_pred_svc_cv,    yma_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
     print("Stacking . . . .")
     #stack
-    stack_train =pd.concat([yat_pred_rf_train, yat_pred_xgb_train, yat_pred_lr_train,
-                            yes_pred_rf_train, yes_pred_xgb_train, yes_pred_lr_train,
-                            yke_pred_rf_train, yke_pred_xgb_train, yke_pred_lr_train,
-                            ypc_pred_rf_train, ypc_pred_xgb_train, ypc_pred_lr_train,
-                            yss_pred_rf_train, yss_pred_xgb_train, yss_pred_lr_train,
-                            ycd_pred_rf_train, ycd_pred_xgb_train, ycd_pred_lr_train,
-                            ycn_pred_rf_train, ycn_pred_xgb_train, ycn_pred_lr_train,
-                            ykc_pred_rf_train, ykc_pred_xgb_train, ykc_pred_lr_train,
-                            yce_pred_rf_train, yce_pred_xgb_train, yce_pred_lr_train,
-                            ysc_pred_rf_train, ysc_pred_xgb_train, ysc_pred_lr_train,
-                            yac_pred_rf_train, yac_pred_xgb_train, yac_pred_lr_train,
-                            yma_pred_rf_train, yma_pred_xgb_train, yma_pred_lr_train,],  axis=1)
-    stack_cv    =pd.concat([yat_pred_rf_cv,    yat_pred_xgb_cv,    yat_pred_lr_cv,
-                            yes_pred_rf_cv,    yes_pred_xgb_cv,    yes_pred_lr_cv,
-                            yke_pred_rf_cv,    yke_pred_xgb_cv,    yke_pred_lr_cv,
-                            ypc_pred_rf_cv,    ypc_pred_xgb_cv,    ypc_pred_lr_cv,
-                            yss_pred_rf_cv,    yss_pred_xgb_cv,    yss_pred_lr_cv,
-                            ycd_pred_rf_cv,    ycd_pred_xgb_cv,    ycd_pred_lr_cv,
-                            ycn_pred_rf_cv,    ycn_pred_xgb_cv,    ycn_pred_lr_cv,
-                            ykc_pred_rf_cv,    ykc_pred_xgb_cv,    ykc_pred_lr_cv,
-                            yce_pred_rf_cv,    yce_pred_xgb_cv,    yce_pred_lr_cv,
-                            ysc_pred_rf_cv,    ysc_pred_xgb_cv,    ysc_pred_lr_cv,
-                            yac_pred_rf_cv,    yac_pred_xgb_cv,    yac_pred_lr_cv,
-                            yma_pred_rf_cv,    yma_pred_xgb_cv,    yma_pred_lr_cv,],  axis=1)
-    stack_test  =pd.concat([yat_pred_rf_test,  yat_pred_xgb_test,  yat_pred_lr_test,
-                            yes_pred_rf_test,  yes_pred_xgb_test,  yes_pred_lr_test,
-                            yke_pred_rf_test,  yke_pred_xgb_test,  yke_pred_lr_test,
-                            ypc_pred_rf_test,  ypc_pred_xgb_test,  ypc_pred_lr_test,
-                            yss_pred_rf_test,  yss_pred_xgb_test,  yss_pred_lr_test,
-                            ycd_pred_rf_test,  ycd_pred_xgb_test,  ycd_pred_lr_test,
-                            ycn_pred_rf_test,  ycn_pred_xgb_test,  ycn_pred_lr_test,
-                            ykc_pred_rf_test,  ykc_pred_xgb_test,  ykc_pred_lr_test,
-                            yce_pred_rf_test,  yce_pred_xgb_test,  yce_pred_lr_test,
-                            ysc_pred_rf_test,  ysc_pred_xgb_test,  ysc_pred_lr_test,
-                            yac_pred_rf_test,  yac_pred_xgb_test,  yac_pred_lr_test,
-                            yma_pred_rf_test,  yma_pred_xgb_test,  yma_pred_lr_test,],  axis=1)
+    stack_train =pd.concat([yat_pred_rf_train, yat_pred_xgb_train, yat_pred_svc_train,
+                            yes_pred_rf_train, yes_pred_xgb_train, yes_pred_svc_train,
+                            yke_pred_rf_train, yke_pred_xgb_train, yke_pred_svc_train,
+                            ypc_pred_rf_train, ypc_pred_xgb_train, ypc_pred_svc_train,
+                            yss_pred_rf_train, yss_pred_xgb_train, yss_pred_svc_train,
+                            ycd_pred_rf_train, ycd_pred_xgb_train, ycd_pred_svc_train,
+                            ycn_pred_rf_train, ycn_pred_xgb_train, ycn_pred_svc_train,
+                            ykc_pred_rf_train, ykc_pred_xgb_train, ykc_pred_svc_train,
+                            yce_pred_rf_train, yce_pred_xgb_train, yce_pred_svc_train,
+                            ysc_pred_rf_train, ysc_pred_xgb_train, ysc_pred_svc_train,
+                            yac_pred_rf_train, yac_pred_xgb_train, yac_pred_svc_train,
+                            yma_pred_rf_train, yma_pred_xgb_train, yma_pred_svc_train,],  axis=1)
+    stack_cv    =pd.concat([yat_pred_rf_cv,    yat_pred_xgb_cv,    yat_pred_svc_cv,
+                            yes_pred_rf_cv,    yes_pred_xgb_cv,    yes_pred_svc_cv,
+                            yke_pred_rf_cv,    yke_pred_xgb_cv,    yke_pred_svc_cv,
+                            ypc_pred_rf_cv,    ypc_pred_xgb_cv,    ypc_pred_svc_cv,
+                            yss_pred_rf_cv,    yss_pred_xgb_cv,    yss_pred_svc_cv,
+                            ycd_pred_rf_cv,    ycd_pred_xgb_cv,    ycd_pred_svc_cv,
+                            ycn_pred_rf_cv,    ycn_pred_xgb_cv,    ycn_pred_svc_cv,
+                            ykc_pred_rf_cv,    ykc_pred_xgb_cv,    ykc_pred_svc_cv,
+                            yce_pred_rf_cv,    yce_pred_xgb_cv,    yce_pred_svc_cv,
+                            ysc_pred_rf_cv,    ysc_pred_xgb_cv,    ysc_pred_svc_cv,
+                            yac_pred_rf_cv,    yac_pred_xgb_cv,    yac_pred_svc_cv,
+                            yma_pred_rf_cv,    yma_pred_xgb_cv,    yma_pred_svc_cv,],  axis=1)
+    stack_test  =pd.concat([yat_pred_rf_test,  yat_pred_xgb_test,  yat_pred_svc_test,
+                            yes_pred_rf_test,  yes_pred_xgb_test,  yes_pred_svc_test,
+                            yke_pred_rf_test,  yke_pred_xgb_test,  yke_pred_svc_test,
+                            ypc_pred_rf_test,  ypc_pred_xgb_test,  ypc_pred_svc_test,
+                            yss_pred_rf_test,  yss_pred_xgb_test,  yss_pred_svc_test,
+                            ycd_pred_rf_test,  ycd_pred_xgb_test,  ycd_pred_svc_test,
+                            ycn_pred_rf_test,  ycn_pred_xgb_test,  ycn_pred_svc_test,
+                            ykc_pred_rf_test,  ykc_pred_xgb_test,  ykc_pred_svc_test,
+                            yce_pred_rf_test,  yce_pred_xgb_test,  yce_pred_svc_test,
+                            ysc_pred_rf_test,  ysc_pred_xgb_test,  ysc_pred_svc_test,
+                            yac_pred_rf_test,  yac_pred_xgb_test,  yac_pred_svc_test,
+                            yma_pred_rf_test,  yma_pred_xgb_test,  yma_pred_svc_test,],  axis=1)
     #save stack original
     stack_train.to_csv(os.path.join( name, 'stack', "stacked_train.csv"))
     stack_cv.to_csv(os.path.join(    name, 'stack', "stacked_cv.csv"))
@@ -353,7 +353,7 @@ def stacked_class(name):
     #stack_test_selected.to_csv( os.path.join(name, 'stack', "stacked_test_selected.csv" ))
     
     #Train
-    stacked_model = LogisticRegressionCV(cv=5, max_iter=100).fit(stack_train, y_train)
+    stacked_model = LogisticRegressionCV(cv=5).fit(stack_train, y_train)
     dump(stacked_model, os.path.join(name, 'stack', "stacked_model.joblib"))
 
     y_pred_stk_train,  y_metric_stk_train = y_prediction(   stacked_model, stack_train, y_train, "y_pred_stacked")
@@ -363,42 +363,42 @@ def stacked_class(name):
     y_pred_stk_test .to_csv(os.path.join( name, 'stack', "y_pred_test.csv"))
     y_pred_stk_cv   .to_csv(os.path.join( name, 'stack', "y_pred_cv.csv"))
     #combine metrics
-    metric_train= pd.concat([yat_metric_rf_train, yat_metric_xgb_train, yat_metric_lr_train,
-                            yes_metric_rf_train, yes_metric_xgb_train,  yes_metric_lr_train,
-                            yke_metric_rf_train, yke_metric_xgb_train,  yke_metric_lr_train,
-                            ypc_metric_rf_train, ypc_metric_xgb_train,  ypc_metric_lr_train,
-                            yss_metric_rf_train, yss_metric_xgb_train,  yss_metric_lr_train,
-                            ycd_metric_rf_train, ycd_metric_xgb_train,  ycd_metric_lr_train,
-                            ycn_metric_rf_train, ycn_metric_xgb_train,  ycn_metric_lr_train,
-                            ykc_metric_rf_train, ykc_metric_xgb_train,  ykc_metric_lr_train,
-                            yce_metric_rf_train, yce_metric_xgb_train,  yce_metric_lr_train,
-                            ysc_metric_rf_train, ysc_metric_xgb_train,  ysc_metric_lr_train,
-                            yac_metric_rf_train, yac_metric_xgb_train,  yac_metric_lr_train,
-                            yma_metric_rf_train, yma_metric_xgb_train,  yma_metric_lr_train, y_metric_stk_train],  axis=0)
-    metric_cv  = pd.concat([yat_metric_rf_cv, yat_metric_xgb_cv,        yat_metric_lr_cv,
-                            yes_metric_rf_cv, yes_metric_xgb_cv,        yes_metric_lr_cv,
-                            yke_metric_rf_cv, yke_metric_xgb_cv,        yke_metric_lr_cv,
-                            ypc_metric_rf_cv, ypc_metric_xgb_cv,        ypc_metric_lr_cv,
-                            yss_metric_rf_cv, yss_metric_xgb_cv,        yss_metric_lr_cv,
-                            ycd_metric_rf_cv, ycd_metric_xgb_cv,        ycd_metric_lr_cv,
-                            ycn_metric_rf_cv, ycn_metric_xgb_cv,        ycn_metric_lr_cv,
-                            ykc_metric_rf_cv, ykc_metric_xgb_cv,        ykc_metric_lr_cv,
-                            yce_metric_rf_cv, yce_metric_xgb_cv,        yce_metric_lr_cv,
-                            ysc_metric_rf_cv, ysc_metric_xgb_cv,        ysc_metric_lr_cv,
-                            yac_metric_rf_cv, yac_metric_xgb_cv,        yac_metric_lr_cv,
-                            yma_metric_rf_cv, yma_metric_xgb_cv,        yma_metric_lr_cv, y_metric_stk_cv],  axis=0)
-    metric_test= pd.concat([yat_metric_rf_test, yat_metric_xgb_test,    yat_metric_lr_test,
-                            yes_metric_rf_test, yes_metric_xgb_test,    yes_metric_lr_test,
-                            yke_metric_rf_test, yke_metric_xgb_test,    yke_metric_lr_test,
-                            ypc_metric_rf_test, ypc_metric_xgb_test,    ypc_metric_lr_test,
-                            yss_metric_rf_test, yss_metric_xgb_test,    yss_metric_lr_test,
-                            ycd_metric_rf_test, ycd_metric_xgb_test,    ycd_metric_lr_test,
-                            ycn_metric_rf_test, ycn_metric_xgb_test,    ycn_metric_lr_test,
-                            ykc_metric_rf_test, ykc_metric_xgb_test,    ykc_metric_lr_test,
-                            yce_metric_rf_test, yce_metric_xgb_test,    yce_metric_lr_test,
-                            ysc_metric_rf_test, ysc_metric_xgb_test,    ysc_metric_lr_test,
-                            yac_metric_rf_test, yac_metric_xgb_test,    yac_metric_lr_test,
-                            yma_metric_rf_test, yma_metric_xgb_test,    yma_metric_lr_test, y_metric_stk_test],  axis=0)
+    metric_train= pd.concat([yat_metric_rf_train, yat_metric_xgb_train, yat_metric_svc_train,
+                            yes_metric_rf_train, yes_metric_xgb_train,  yes_metric_svc_train,
+                            yke_metric_rf_train, yke_metric_xgb_train,  yke_metric_svc_train,
+                            ypc_metric_rf_train, ypc_metric_xgb_train,  ypc_metric_svc_train,
+                            yss_metric_rf_train, yss_metric_xgb_train,  yss_metric_svc_train,
+                            ycd_metric_rf_train, ycd_metric_xgb_train,  ycd_metric_svc_train,
+                            ycn_metric_rf_train, ycn_metric_xgb_train,  ycn_metric_svc_train,
+                            ykc_metric_rf_train, ykc_metric_xgb_train,  ykc_metric_svc_train,
+                            yce_metric_rf_train, yce_metric_xgb_train,  yce_metric_svc_train,
+                            ysc_metric_rf_train, ysc_metric_xgb_train,  ysc_metric_svc_train,
+                            yac_metric_rf_train, yac_metric_xgb_train,  yac_metric_svc_train,
+                            yma_metric_rf_train, yma_metric_xgb_train,  yma_metric_svc_train, y_metric_stk_train],  axis=0)
+    metric_cv  = pd.concat([yat_metric_rf_cv, yat_metric_xgb_cv,        yat_metric_svc_cv,
+                            yes_metric_rf_cv, yes_metric_xgb_cv,        yes_metric_svc_cv,
+                            yke_metric_rf_cv, yke_metric_xgb_cv,        yke_metric_svc_cv,
+                            ypc_metric_rf_cv, ypc_metric_xgb_cv,        ypc_metric_svc_cv,
+                            yss_metric_rf_cv, yss_metric_xgb_cv,        yss_metric_svc_cv,
+                            ycd_metric_rf_cv, ycd_metric_xgb_cv,        ycd_metric_svc_cv,
+                            ycn_metric_rf_cv, ycn_metric_xgb_cv,        ycn_metric_svc_cv,
+                            ykc_metric_rf_cv, ykc_metric_xgb_cv,        ykc_metric_svc_cv,
+                            yce_metric_rf_cv, yce_metric_xgb_cv,        yce_metric_svc_cv,
+                            ysc_metric_rf_cv, ysc_metric_xgb_cv,        ysc_metric_svc_cv,
+                            yac_metric_rf_cv, yac_metric_xgb_cv,        yac_metric_svc_cv,
+                            yma_metric_rf_cv, yma_metric_xgb_cv,        yma_metric_svc_cv, y_metric_stk_cv],  axis=0)
+    metric_test= pd.concat([yat_metric_rf_test, yat_metric_xgb_test,    yat_metric_svc_test,
+                            yes_metric_rf_test, yes_metric_xgb_test,    yes_metric_svc_test,
+                            yke_metric_rf_test, yke_metric_xgb_test,    yke_metric_svc_test,
+                            ypc_metric_rf_test, ypc_metric_xgb_test,    ypc_metric_svc_test,
+                            yss_metric_rf_test, yss_metric_xgb_test,    yss_metric_svc_test,
+                            ycd_metric_rf_test, ycd_metric_xgb_test,    ycd_metric_svc_test,
+                            ycn_metric_rf_test, ycn_metric_xgb_test,    ycn_metric_svc_test,
+                            ykc_metric_rf_test, ykc_metric_xgb_test,    ykc_metric_svc_test,
+                            yce_metric_rf_test, yce_metric_xgb_test,    yce_metric_svc_test,
+                            ysc_metric_rf_test, ysc_metric_xgb_test,    ysc_metric_svc_test,
+                            yac_metric_rf_test, yac_metric_xgb_test,    yac_metric_svc_test,
+                            yma_metric_rf_test, yma_metric_xgb_test,    yma_metric_svc_test, y_metric_stk_test],  axis=0)
     metric_train.to_csv(os.path.join( name, "metric_train.csv"))
     metric_cv   .to_csv(os.path.join( name, "metric_cv.csv"))
     metric_test .to_csv(os.path.join( name, "metric_test.csv"))

@@ -1,9 +1,9 @@
 Name,y_pred_stacked
 Lipoic acid,0
-Cholic acid,0
+Cholic acid,1
 Ursodexycholic acid,1
-Obeticholic acid,0
-Aramchol,0
+Obeticholic acid,1
+Aramchol,1
 Acetaminophen,0
 Gallic acid,0
 Epigallocatechin gallate,0
