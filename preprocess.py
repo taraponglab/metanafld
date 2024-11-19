@@ -185,7 +185,7 @@ def main():
         df = df.drop_duplicates(subset = ['canonical_smiles'], keep=False)
         print(i,":",  len(df))
         df.to_csv(os.path.join(i+".csv"))
-        x_train, x_test, y_train, y_test = create_train_test_scaffold(df, "canonical_smiles", "class",i, test_size=0.4)
+        x_train, x_test, y_train, y_test = create_train_test_scaffold(df, "canonical_smiles", "class",i, test_size=0.3)
         print(i," train:",  len(x_train), " test:",  len(x_test))
         fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(x_train, i, "train")
         fp_reduced_train(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="train")
