@@ -10,13 +10,13 @@ Diethylnitrosamine,0
 Carbon tetrachloride,1
 Methionine,0
 MSG,0
-PFOS,1
+PFOS,0
 Alanyl-glutamine,1
 TMAO,1
-Sodium Butyrate,1
+Sodium Butyrate,0
 Metformin,1
-Sulforaphane,1
-Taurine,1
+Sulforaphane,0
+Taurine,0
 Clodronate,1
 Microcystin-LR,0
 Allopurinol,0
@@ -30,7 +30,7 @@ Elafibranor,0
 TCDD,1
 Rosiglitazone,0
 Citicoline,0
-Gemigliptin,1
+Gemigliptin,0
 Geniposide,0
 Scoparone,0
 Berberine,0
