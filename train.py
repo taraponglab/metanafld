@@ -359,14 +359,18 @@ def stacked_class(name):
     param_grid = {
     'max_depth': [3, 5],
     'n_estimators': [100, 200],
-    'learning_rate': [0.01, 0.1, 0.2]
+    'learning_rate': [0.01, 0.1, 0.2],
     }
     
     # Set up GridSearchCV
-    stacked_model = GridSearchCV(estimator=stacked_xgb, param_grid=param_grid, scoring='roc_auc', cv=3, verbose=1)
+    grid_search = GridSearchCV(estimator=stacked_xgb, param_grid=param_grid, scoring='roc_auc', cv=3, verbose=1)
+    grid_search.fit(stack_train, y_train)
+    best_params = grid_search.best_params_
+    print("Best parameters found: ", best_params)
+    print("Best AUC found: ", grid_search.best_score_)
+    stacked_model = xgb.XGBClassifier(**best_params)
+    stacked_model.set_params(objective='binary:logistic', eval_metric='auc', random_state=1)
     stacked_model.fit(stack_train, y_train)
-    print("Best parameters found: ", stacked_model.best_params_)
-    print("Best AUC found: ", stacked_model.best_score_())
     dump(stacked_model, os.path.join(name, 'stack', "stacked_model.joblib"))
 
     y_pred_stk_train,  y_metric_stk_train = y_prediction(   stacked_model, stack_train, y_train, "y_pred_stacked")
