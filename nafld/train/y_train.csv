@@ -1,43 +1,54 @@
 Name,class
-Dihydrotestosterone,1
-Vitamin D3,0
-Curcumin,0
-Thioacetamide,1
-Palmitoleic acid,0
-Oleic acid,0
-10-nitrooleic acid,1
-Diethylnitrosamine,1
-Carbon tetrachloride,1
-Methionine,1
-MSG,1
-PFOS,1
-Alanyl-glutamine,0
-TMAO,0
-Sodium Butyrate,0
-Metformin,0
-Sulforaphane,0
-Taurine,0
-Clodronate,0
-Microcystin-LR,1
-Allopurinol,0
-Empagliflozin,0
-T0901317,1
-Rapamycin,0
-Bavachinin,0
-Naringenin,0
-Dihydromyricetin,0
-Elafibranor,0
-TCDD,1
-Rosiglitazone,0
-Citicoline,0
-Gemigliptin,0
-Geniposide,0
-Scoparone,0
-Berberine,0
-Tamoxifen,1
-PCB 126,1
-Aroclor 1260,1
-Tetracycline,1
-Streptozotocin,1
-Glucose,1
-Fructose,1
+PCB 126,0
+Aroclor 1260,0
+Pirfenidone,1
+Quercetin,1
+Chrysin,1
+Chlorogenic acid,1
+Geniposide,1
+Melatonin,1
+TCDD,0
+Empagliflozin,1
+Cholic acid,0
+Ursodexycholic acid,1
+Obeticholic acid,1
+Aramchol,1
+Vitamin D3,1
+Dihydrotestosterone,0
+Caffeine,1
+Rapamycin,1
+Silibinin,1
+Silymarin,1
+Tetracycline,0
+Citicoline,1
+Streptozotocin,0
+Glucose,0
+Fructose,0
+Doxorubicin,0
+Microcystin-LR,0
+LPS,0
+Resveratrol,1
+Thioacetamide,0
+Palmitoleic acid,1
+Oleic acid,1
+10-nitrooleic acid,0
+Diethylnitrosamine,0
+Carbon tetrachloride,0
+Methionine,0
+MSG,0
+PFOS,0
+Alanyl-glutamine,1
+TMAO,1
+Sodium Butyrate,1
+Metformin,1
+Sulforaphane,1
+Taurine,1
+Clodronate,1
+Tamoxifen,0
+T0901317,0
+Scoparone,1
+Acetaminophen,0
+Gallic acid,1
+Gemigliptin,1
+Diosgenin,1
+Berberine,1

@@ -179,18 +179,23 @@ def fp_reduced_test(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_c
     fp_ac.to_csv(os.path.join(name, fol_path ,'xac_test.csv'))
     fp_ma.to_csv(os.path.join(name, fol_path ,'xma_test.csv'))
     return fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma
+
+
+
 def main():
     for i in ['nafld']: #'ames', 
         df = pd.read_csv(i+".csv", index_col=0)
+        #df["class"] = df["class"].replace({'Inhibitor': 1, 'Inducer': 0})
         df = df.drop_duplicates(subset = ['canonical_smiles'], keep=False)
         print(i,":",  len(df))
         df.to_csv(os.path.join(i+".csv"))
         x_train, x_test, y_train, y_test = create_train_test_scaffold(df, "canonical_smiles", "class",i, test_size=0.3)
+        y_train.to_csv
         print(i," train:",  len(x_train), " test:",  len(x_test))
         fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(x_train, i, "train")
-        fp_reduced_train(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="train")
+        #fp_reduced_train(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="train")
         fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(x_test, i, "test")
-        fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = fp_reduced_test(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="test")
+        #fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = fp_reduced_test(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="test")
         
 if __name__ == "__main__":
     main()
