@@ -281,6 +281,24 @@ def stacked_class(name):
     yac_pred_svc_cv,    yac_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
     yma_pred_svc_cv,    yma_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
     print("Stacking")
+    #Learning from Evaluation
+    yat_pred_rf_train *= yat_metric_rf_train.loc["yat_pred_rf", "AUC"] 
+    yes_pred_rf_train *= yes_metric_rf_train.loc["yes_pred_rf", "AUC"] 
+    yke_pred_rf_train *= yke_metric_rf_train.loc["yke_pred_rf", "AUC"] 
+    ypc_pred_rf_train *= ypc_metric_rf_train.loc["ypc_pred_rf", "AUC"] 
+    yss_pred_rf_train *= yss_metric_rf_train.loc["yss_pred_rf", "AUC"] 
+    ycd_pred_rf_train *= ycd_metric_rf_train.loc["ycd_pred_rf", "AUC"] 
+    ycn_pred_rf_train *= ycn_metric_rf_train.loc["ycn_pred_rf", "AUC"] 
+    ykc_pred_rf_train *= ykc_metric_rf_train.loc["ykc_pred_rf", "AUC"] 
+    yce_pred_rf_train *= yce_metric_rf_train.loc["yce_pred_rf", "AUC"] 
+    ysc_pred_rf_train *= ysc_metric_rf_train.loc["ysc_pred_rf", "AUC"] 
+    yac_pred_rf_train *= yac_metric_rf_train.loc["yac_pred_rf", "AUC"] 
+    yma_pred_rf_train *= yma_metric_rf_train.loc["yma_pred_rf", "AUC"] 
+    
+    x=[metric_train.loc['y_pred_stacked', 'MCC']]
+    y=[metric_test.loc['y_pred_stacked', 'MCC']]
+    
+    
     #stack
     stack_train =pd.concat([yat_pred_rf_train, yat_pred_xgb_train, yat_pred_svc_train,
                             yes_pred_rf_train, yes_pred_xgb_train, yes_pred_svc_train,
@@ -322,6 +340,7 @@ def stacked_class(name):
     stack_train.to_csv(os.path.join( name, 'stack', "stacked_train.csv"))
     stack_cv.to_csv(os.path.join(    name, 'stack', "stacked_cv.csv"))
     stack_test.to_csv(os.path.join(  name, 'stack', "stacked_test.csv"))
+    
     #Train
     stacked_xgb = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=1)
     
@@ -569,7 +588,7 @@ def main():
         print("finish yrandom ", name)
         plot_importance_xgb(stacked_model, name)
         print("finish top features ", name)
-        run_ad(stacked_model, stack_cv, stack_test, y_test, name, z=1)
+        run_ad(stacked_model, stack_cv, stack_test, y_test, name, z=3)
         print("finish ad ", name)
 if __name__ == "__main__":
     main()

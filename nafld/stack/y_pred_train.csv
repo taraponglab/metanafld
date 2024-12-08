@@ -1,15 +1,15 @@
 Name,y_pred_stacked
-PCB 126,0
-Aroclor 1260,0
+PCB 126,1
+Aroclor 1260,1
 Pirfenidone,1
 Quercetin,1
 Chrysin,1
 Chlorogenic acid,1
 Geniposide,1
 Melatonin,1
-TCDD,0
+TCDD,1
 Empagliflozin,1
-Cholic acid,0
+Cholic acid,1
 Ursodexycholic acid,1
 Obeticholic acid,1
 Aramchol,1
@@ -19,24 +19,24 @@ Caffeine,1
 Rapamycin,1
 Silibinin,1
 Silymarin,1
-Tetracycline,0
+Tetracycline,1
 Citicoline,1
-Streptozotocin,0
+Streptozotocin,1
 Glucose,0
-Fructose,0
-Doxorubicin,0
-Microcystin-LR,0
-LPS,0
+Fructose,1
+Doxorubicin,1
+Microcystin-LR,1
+LPS,1
 Resveratrol,1
-Thioacetamide,0
+Thioacetamide,1
 Palmitoleic acid,1
 Oleic acid,1
 10-nitrooleic acid,0
-Diethylnitrosamine,0
-Carbon tetrachloride,0
-Methionine,0
-MSG,0
-PFOS,0
+Diethylnitrosamine,1
+Carbon tetrachloride,1
+Methionine,1
+MSG,1
+PFOS,1
 Alanyl-glutamine,1
 TMAO,1
 Sodium Butyrate,1
@@ -44,10 +44,10 @@ Metformin,1
 Sulforaphane,1
 Taurine,1
 Clodronate,1
-Tamoxifen,0
-T0901317,0
+Tamoxifen,1
+T0901317,1
 Scoparone,1
-Acetaminophen,0
+Acetaminophen,1
 Gallic acid,1
 Gemigliptin,1
 Diosgenin,1
