@@ -91,112 +91,16 @@ def create_train_test_scaffold(df, smiles, acvalue_um, name, test_size):
     return x_train, x_test, y_train, y_test
 
 
-def fp_reduced_train(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, name, fol_path="train"):
-    #delete constant
-    fp_at = cp.remove_constant_string_des(fp_at)
-    fp_es = cp.remove_constant_string_des(fp_es)
-    fp_ke = cp.remove_constant_string_des(fp_ke)
-    fp_pc = cp.remove_constant_string_des(fp_pc)
-    fp_ss = cp.remove_constant_string_des(fp_ss)
-    fp_cd = cp.remove_constant_string_des(fp_cd)
-    fp_cn = cp.remove_constant_string_des(fp_cn)
-    fp_kc = cp.remove_constant_string_des(fp_kc)
-    fp_ce = cp.remove_constant_string_des(fp_ce)
-    fp_sc = cp.remove_constant_string_des(fp_sc)
-    fp_ac = cp.remove_constant_string_des(fp_ac)
-    fp_ma = cp.remove_constant_string_des(fp_ma)
-    #delete high correlate
-    fp_at = cp.remove_highly_correlated_features(fp_at)
-    fp_es = cp.remove_highly_correlated_features(fp_es)
-    fp_ke = cp.remove_highly_correlated_features(fp_ke)
-    fp_pc = cp.remove_highly_correlated_features(fp_pc)
-    fp_ss = cp.remove_highly_correlated_features(fp_ss)
-    fp_cd = cp.remove_highly_correlated_features(fp_cd)
-    fp_cn = cp.remove_highly_correlated_features(fp_cn)
-    fp_kc = cp.remove_highly_correlated_features(fp_kc)
-    fp_ce = cp.remove_highly_correlated_features(fp_ce)
-    fp_sc = cp.remove_highly_correlated_features(fp_sc)
-    fp_ac = cp.remove_highly_correlated_features(fp_ac)
-    fp_ma = cp.remove_highly_correlated_features(fp_ma)
-    #save
-    fp_at.to_csv(os.path.join(name, fol_path ,'xat_train.csv'))
-    fp_es.to_csv(os.path.join(name, fol_path ,'xes_train.csv'))
-    fp_ke.to_csv(os.path.join(name, fol_path ,'xke_train.csv'))
-    fp_pc.to_csv(os.path.join(name, fol_path ,'xpc_train.csv'))
-    fp_ss.to_csv(os.path.join(name, fol_path ,'xss_train.csv'))
-    fp_cd.to_csv(os.path.join(name, fol_path ,'xcd_train.csv'))
-    fp_cn.to_csv(os.path.join(name, fol_path ,'xcn_train.csv'))
-    fp_kc.to_csv(os.path.join(name, fol_path ,'xkc_train.csv'))
-    fp_ce.to_csv(os.path.join(name, fol_path ,'xce_train.csv'))
-    fp_sc.to_csv(os.path.join(name, fol_path ,'xsc_train.csv'))
-    fp_ac.to_csv(os.path.join(name, fol_path ,'xac_train.csv'))
-    fp_ma.to_csv(os.path.join(name, fol_path ,'xma_train.csv'))
-    return fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma
-
-def select_col(df, columns_list):
-    missing_columns = [col for col in columns_list if col not in df.columns]
-    if not missing_columns:
-        return df[columns_list]
-    else:
-        return f"Column(s) missing: {', '.join(missing_columns)}"
-    
-def fp_reduced_test(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, name, fol_path="test"):
-    fp_at_sel = pd.read_csv(os.path.join(name, "train", "xat_train.csv"), index_col=0)
-    fp_es_sel = pd.read_csv(os.path.join(name, "train", "xes_train.csv"), index_col=0)
-    fp_ke_sel = pd.read_csv(os.path.join(name, "train", "xke_train.csv"), index_col=0)
-    fp_pc_sel = pd.read_csv(os.path.join(name, "train", "xpc_train.csv"), index_col=0)
-    fp_ss_sel = pd.read_csv(os.path.join(name, "train", "xss_train.csv"), index_col=0)
-    fp_cd_sel = pd.read_csv(os.path.join(name, "train", "xcd_train.csv"), index_col=0)
-    fp_cn_sel = pd.read_csv(os.path.join(name, "train", "xcn_train.csv"), index_col=0)
-    fp_kc_sel = pd.read_csv(os.path.join(name, "train", "xkc_train.csv"), index_col=0)
-    fp_ce_sel = pd.read_csv(os.path.join(name, "train", "xce_train.csv"), index_col=0)
-    fp_sc_sel = pd.read_csv(os.path.join(name, "train", "xsc_train.csv"), index_col=0)
-    fp_ac_sel = pd.read_csv(os.path.join(name, "train", "xac_train.csv"), index_col=0)
-    fp_ma_sel = pd.read_csv(os.path.join(name, "train", "xma_train.csv"), index_col=0)
-    fp_at = fp_at[fp_at_sel.columns]
-    fp_es = fp_es[fp_es_sel.columns]
-    fp_ke = fp_ke[fp_ke_sel.columns]
-    fp_pc = fp_pc[fp_pc_sel.columns]
-    fp_ss = fp_ss[fp_ss_sel.columns]
-    fp_cd = fp_cd[fp_cd_sel.columns]
-    fp_cn = fp_cn[fp_cn_sel.columns]
-    fp_kc = fp_kc[fp_kc_sel.columns]
-    fp_ce = fp_ce[fp_ce_sel.columns]
-    fp_sc = fp_sc[fp_sc_sel.columns]
-    fp_ac = fp_ac[fp_ac_sel.columns]
-    fp_ma = fp_ma[fp_ma_sel.columns]
-    #save
-    fp_at.to_csv(os.path.join(name, fol_path ,'xat_test.csv'))
-    fp_es.to_csv(os.path.join(name, fol_path ,'xes_test.csv'))
-    fp_ke.to_csv(os.path.join(name, fol_path ,'xke_test.csv'))
-    fp_pc.to_csv(os.path.join(name, fol_path ,'xpc_test.csv'))
-    fp_ss.to_csv(os.path.join(name, fol_path ,'xss_test.csv'))
-    fp_cd.to_csv(os.path.join(name, fol_path ,'xcd_test.csv'))
-    fp_cn.to_csv(os.path.join(name, fol_path ,'xcn_test.csv'))
-    fp_kc.to_csv(os.path.join(name, fol_path ,'xkc_test.csv'))
-    fp_ce.to_csv(os.path.join(name, fol_path ,'xce_test.csv'))
-    fp_sc.to_csv(os.path.join(name, fol_path ,'xsc_test.csv'))
-    fp_ac.to_csv(os.path.join(name, fol_path ,'xac_test.csv'))
-    fp_ma.to_csv(os.path.join(name, fol_path ,'xma_test.csv'))
-    return fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma
-
-
-
 def main():
     for i in ['nafld']: #'ames', 
         df = pd.read_csv(i+".csv", index_col=0)
-        #df["class"] = df["class"].replace({'Inhibitor': 1, 'Inducer': 0})
         df = df.drop_duplicates(subset = ['canonical_smiles'], keep=False)
         print(i,":",  len(df))
         df.to_csv(os.path.join(i+".csv"))
         x_train, x_test, y_train, y_test = create_train_test_scaffold(df, "canonical_smiles", "class",i, test_size=0.3)
-        y_train.to_csv
         print(i," train:",  len(x_train), " test:",  len(x_test))
         fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(x_train, i, "train")
-        #fp_reduced_train(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="train")
         fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(x_test, i, "test")
-        #fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = fp_reduced_test(fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma, i, fol_path="test")
-        
 if __name__ == "__main__":
     main()
     
