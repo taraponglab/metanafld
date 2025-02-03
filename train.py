@@ -65,10 +65,10 @@ def y_prediction_cv(model, x_train, y_train, col_name):
         'Sensitivity': [sen],
         'Specificity': [spc],
         'MCC': [mcc],
-        'F1 Score': [f1],
         'AUC': [auc],
         'BACC': [bcc],
-        'Precision': [pre]
+        'Precision': [pre],
+        'F1 Score': [f1],
     }, index=[col_name])
     return y_pred, metrics
 
@@ -419,6 +419,7 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     AUC_values = []
     F1_values = []
     BA_values = []
+    Pre_values = []
     removed_compounds_values = []
 
     # Remove outside AD
@@ -442,7 +443,8 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
         auc = roc_auc_score(y_ad_test, y_pred_test)
         mcc = round(matthews_corrcoef(y_ad_test, y_pred_test), 3)
         balanced_acc = round(balanced_accuracy_score(y_ad_test, y_pred_test), 3)
-        print('ACC: ', accuracy, 'Sen: ', sensitivity, 'Spe: ', specificity, 'AUC: ', auc, 'MCC: ', mcc, 'F1: ', F1, 'BA: ', balanced_acc)
+        pre_scores = round(precision_score(y_ad_test, y_pred_test), 3)
+        print('ACC: ', accuracy, 'Sen: ', sensitivity, 'Spe: ', specificity, 'MCC: ', mcc,'AUC: ', auc,'BA: ', balanced_acc, 'Pre:', pre_scores, 'F1: ', F1)
         # Store metrics for plotting
         MCC_values.append(mcc)
         ACC_values.append(accuracy)
@@ -451,6 +453,7 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
         AUC_values.append(auc)
         F1_values.append(F1)
         BA_values.append(balanced_acc)
+        Pre_values.append(pre_scores)
         removed_compounds_values.append((t['AD_status'] == 'outside_AD').sum())
     k_values   = np.array(k_values)
     MCC_values = np.array(MCC_values)
@@ -460,16 +463,18 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     AUC_values = np.array(AUC_values)
     F1_values  = np.array(F1_values)
     BA_values  = np.array(BA_values)
+    Pre_values = np.array(Pre_values)
     removed_compounds_values = np.array(removed_compounds_values)
     # Plotting
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6, 3))
     
     ax1.plot(k_values, ACC_values, 'kp-', label = "Accuracy")
     ax1.plot(k_values, Sen_values, 'gs-', label = "Sensitivity")
-    ax1.plot(k_values, Spe_values, 'y*-', label = "Speciticity")
+    ax1.plot(k_values, Spe_values, 'y*-', label = "Specificity")
     ax1.plot(k_values, MCC_values, 'r^-', label = "MCC")
-    ax1.plot(k_values, BA_values, 'bo-',  label = "BACC")
     ax1.plot(k_values, AUC_values, 'md-', label = "AUC")
+    ax1.plot(k_values, BA_values, 'bo-',  label = "BACC")
+    ax1.plot(k_values, AUC_values, 'cD-', label = "Precision")
     ax1.plot(k_values, F1_values, 'cX-',  label = "F1")
     # Adding labels and title
     ax1.set_xlabel('k',      fontsize=12, fontstyle='italic',weight="bold")
