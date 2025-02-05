@@ -35,14 +35,14 @@ def y_prediction(model, x_train, y_train, col_name):
 
     # Create a DataFrame to store the metrics
     metrics = pd.DataFrame({
+        'BACC': [bcc],
         'Accuracy': [acc],
         'Sensitivity': [sen],
         'Specificity': [spc],
         'MCC': [mcc],
-        'F1 Score': [f1],
         'AUC': [auc],
-        'BACC': [bcc],
-        'Precision': [pre]
+        'Precision': [pre],
+        'F1 Score': [f1],
     }, index=[col_name])
     return y_pred, metrics
     
@@ -61,12 +61,12 @@ def y_prediction_cv(model, x_train, y_train, col_name):
 
     # Create a DataFrame to store the metrics
     metrics = pd.DataFrame({
+        'BACC': [bcc],
         'Accuracy': [acc],
         'Sensitivity': [sen],
         'Specificity': [spc],
         'MCC': [mcc],
         'AUC': [auc],
-        'BACC': [bcc],
         'Precision': [pre],
         'F1 Score': [f1],
     }, index=[col_name])
@@ -347,42 +347,117 @@ def stacked_class(name):
     y_pred_stk_test .to_csv(os.path.join( name, 'stack', "y_pred_test.csv"))
     y_pred_stk_cv   .to_csv(os.path.join( name, 'stack', "y_pred_cv.csv"))
     #combine metrics
-    metric_train= pd.concat([yat_metric_rf_train, yat_metric_xgb_train, yat_metric_svc_train,
-                            yes_metric_rf_train, yes_metric_xgb_train,  yes_metric_svc_train,
-                            yke_metric_rf_train, yke_metric_xgb_train,  yke_metric_svc_train,
-                            ypc_metric_rf_train, ypc_metric_xgb_train,  ypc_metric_svc_train,
-                            yss_metric_rf_train, yss_metric_xgb_train,  yss_metric_svc_train,
-                            ycd_metric_rf_train, ycd_metric_xgb_train,  ycd_metric_svc_train,
-                            ycn_metric_rf_train, ycn_metric_xgb_train,  ycn_metric_svc_train,
-                            ykc_metric_rf_train, ykc_metric_xgb_train,  ykc_metric_svc_train,
-                            yce_metric_rf_train, yce_metric_xgb_train,  yce_metric_svc_train,
-                            ysc_metric_rf_train, ysc_metric_xgb_train,  ysc_metric_svc_train,
-                            yac_metric_rf_train, yac_metric_xgb_train,  yac_metric_svc_train,
-                            yma_metric_rf_train, yma_metric_xgb_train,  yma_metric_svc_train, y_metric_stk_train],  axis=0)
-    metric_cv  = pd.concat([yat_metric_rf_cv, yat_metric_xgb_cv,        yat_metric_svc_cv,
-                            yes_metric_rf_cv, yes_metric_xgb_cv,        yes_metric_svc_cv,
-                            yke_metric_rf_cv, yke_metric_xgb_cv,        yke_metric_svc_cv,
-                            ypc_metric_rf_cv, ypc_metric_xgb_cv,        ypc_metric_svc_cv,
-                            yss_metric_rf_cv, yss_metric_xgb_cv,        yss_metric_svc_cv,
-                            ycd_metric_rf_cv, ycd_metric_xgb_cv,        ycd_metric_svc_cv,
-                            ycn_metric_rf_cv, ycn_metric_xgb_cv,        ycn_metric_svc_cv,
-                            ykc_metric_rf_cv, ykc_metric_xgb_cv,        ykc_metric_svc_cv,
-                            yce_metric_rf_cv, yce_metric_xgb_cv,        yce_metric_svc_cv,
-                            ysc_metric_rf_cv, ysc_metric_xgb_cv,        ysc_metric_svc_cv,
-                            yac_metric_rf_cv, yac_metric_xgb_cv,        yac_metric_svc_cv,
-                            yma_metric_rf_cv, yma_metric_xgb_cv,        yma_metric_svc_cv, y_metric_stk_cv],  axis=0)
-    metric_test= pd.concat([yat_metric_rf_test, yat_metric_xgb_test,    yat_metric_svc_test,
-                            yes_metric_rf_test, yes_metric_xgb_test,    yes_metric_svc_test,
-                            yke_metric_rf_test, yke_metric_xgb_test,    yke_metric_svc_test,
-                            ypc_metric_rf_test, ypc_metric_xgb_test,    ypc_metric_svc_test,
-                            yss_metric_rf_test, yss_metric_xgb_test,    yss_metric_svc_test,
-                            ycd_metric_rf_test, ycd_metric_xgb_test,    ycd_metric_svc_test,
-                            ycn_metric_rf_test, ycn_metric_xgb_test,    ycn_metric_svc_test,
-                            ykc_metric_rf_test, ykc_metric_xgb_test,    ykc_metric_svc_test,
-                            yce_metric_rf_test, yce_metric_xgb_test,    yce_metric_svc_test,
-                            ysc_metric_rf_test, ysc_metric_xgb_test,    ysc_metric_svc_test,
-                            yac_metric_rf_test, yac_metric_xgb_test,    yac_metric_svc_test,
-                            yma_metric_rf_test, yma_metric_xgb_test,    yma_metric_svc_test, y_metric_stk_test],  axis=0)
+    metric_train= pd.concat([yat_metric_rf_train, 
+                            yac_metric_rf_train,   
+                            ycn_metric_rf_train,   
+                            yce_metric_rf_train,   
+                            ycd_metric_rf_train,   
+                            yes_metric_rf_train,   
+                            yke_metric_rf_train,   
+                            ykc_metric_rf_train,   
+                            yma_metric_rf_train,   
+                            ypc_metric_rf_train,   
+                            yss_metric_rf_train,   
+                            ysc_metric_rf_train,   
+                            yat_metric_svc_train,
+                            yac_metric_svc_train,
+                            ycn_metric_svc_train,
+                            yce_metric_svc_train,
+                            ycd_metric_svc_train,
+                            yes_metric_svc_train,
+                            yke_metric_svc_train,
+                            ykc_metric_svc_train,
+                            yma_metric_svc_train,
+                            ypc_metric_svc_train,
+                            yss_metric_svc_train,
+                            ysc_metric_svc_train,
+                            yat_metric_xgb_train,
+                            yac_metric_xgb_train,
+                            ycn_metric_xgb_train,
+                            yce_metric_xgb_train,
+                            ycd_metric_xgb_train,
+                            yes_metric_xgb_train,
+                            yke_metric_xgb_train,
+                            ykc_metric_xgb_train,
+                            yma_metric_xgb_train,
+                            ypc_metric_xgb_train,
+                            yss_metric_xgb_train,
+                            ysc_metric_xgb_train,
+                            y_metric_stk_train],  axis=0)
+    metric_cv  = pd.concat([yat_metric_rf_cv, 
+                            yac_metric_rf_cv, 
+                            ycn_metric_rf_cv, 
+                            yce_metric_rf_cv, 
+                            ycd_metric_rf_cv, 
+                            yes_metric_rf_cv, 
+                            yke_metric_rf_cv, 
+                            ykc_metric_rf_cv, 
+                            yma_metric_rf_cv, 
+                            ypc_metric_rf_cv, 
+                            yss_metric_rf_cv, 
+                            ysc_metric_rf_cv,  
+                            yat_metric_svc_cv,
+                            yac_metric_svc_cv,
+                            ycn_metric_svc_cv,
+                            yce_metric_svc_cv,
+                            ycd_metric_svc_cv,
+                            yes_metric_svc_cv,
+                            yke_metric_svc_cv,
+                            ykc_metric_svc_cv,
+                            yma_metric_svc_cv,
+                            ypc_metric_svc_cv,
+                            yss_metric_svc_cv,
+                            ysc_metric_svc_cv,
+                            yat_metric_xgb_cv,  
+                            yac_metric_xgb_cv,  
+                            ycn_metric_xgb_cv,  
+                            yce_metric_xgb_cv,  
+                            ycd_metric_xgb_cv,  
+                            yes_metric_xgb_cv,  
+                            yke_metric_xgb_cv,  
+                            ykc_metric_xgb_cv,  
+                            yma_metric_xgb_cv,  
+                            ypc_metric_xgb_cv,  
+                            yss_metric_xgb_cv,  
+                            ysc_metric_xgb_cv,  
+                            y_metric_stk_cv],  axis=0)
+    metric_test= pd.concat([yat_metric_rf_test, 
+                            yac_metric_rf_test,   
+                            ycn_metric_rf_test,   
+                            yce_metric_rf_test,   
+                            ycd_metric_rf_test,   
+                            yes_metric_rf_test,   
+                            yke_metric_rf_test,   
+                            ykc_metric_rf_test,   
+                            yma_metric_rf_test,   
+                            ypc_metric_rf_test,   
+                            yss_metric_rf_test,   
+                            ysc_metric_rf_test,    
+                            yat_metric_svc_test,
+                            yac_metric_svc_test,
+                            ycn_metric_svc_test,
+                            yce_metric_svc_test,
+                            ycd_metric_svc_test,
+                            yes_metric_svc_test,
+                            yke_metric_svc_test,
+                            ykc_metric_svc_test,
+                            yma_metric_svc_test,
+                            ypc_metric_svc_test,
+                            yss_metric_svc_test,
+                            ysc_metric_svc_test,
+                            yat_metric_xgb_test,
+                            yac_metric_xgb_test,
+                            ycn_metric_xgb_test,
+                            yce_metric_xgb_test,
+                            ycd_metric_xgb_test,
+                            yes_metric_xgb_test,
+                            yke_metric_xgb_test,
+                            ykc_metric_xgb_test,
+                            yma_metric_xgb_test,
+                            ypc_metric_xgb_test,
+                            yss_metric_xgb_test,
+                            ysc_metric_xgb_test,
+                            y_metric_stk_test],  axis=0)
     # round number
     metric_train = round(metric_train, 3)
     metric_cv    = round(metric_cv, 3)
@@ -397,7 +472,7 @@ def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
     from sklearn.neighbors import NearestNeighbors
     nn = NearestNeighbors(n_neighbors=k, algorithm='brute', metric='euclidean').fit(x_train)
     dump(nn, os.path.join(name, "ad_"+ str(k) +"_"+ str(z) +".joblib"))
-    distance, index = nn.kneighbors(x_test)
+    distance, index = nn.kneighbors(x_train)
     # Calculate mean and sd of distance in train set
     di = np.mean(distance, axis=1)
     # Find mean and sd of di
@@ -405,15 +480,18 @@ def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
     sk = np.std(di)
     print('dk = ', dk)
     print('sk = ', sk)
+    # Calculate di of test
+    distance, index = nn.kneighbors(x_test)
+    di = np.mean(distance, axis=1)
     AD_status = ['within_AD' if di[i] < dk + (z * sk) else 'outside_AD' for i in range(len(di))]
 
     # Create DataFrame with index from x_test and the respective status
     df = pd.DataFrame(AD_status, index=x_test.index, columns=['AD_status'])
-    return df
+    return df, dk, sk
 
 def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     # Initialize lists to store metrics for plotting
-    k_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    k_values = [3, 4, 5, 6, 7, 8, 9, 10]
     MCC_values = []
     ACC_values = []
     Sen_values = []
@@ -423,11 +501,12 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     BA_values = []
     Pre_values = []
     removed_compounds_values = []
-
+    dk_values = []
+    sk_values = []
     # Remove outside AD
     for i in k_values:
         print('k = ', i, 'z=', str(z))
-        t = nearest_neighbor_AD(stack_cv, stack_test, name, i, z=z)
+        t, dk, sk = nearest_neighbor_AD(stack_cv, stack_test, name, i, z=z)
         print(t['AD_status'].value_counts())
         # Remove outside AD
         x_ad_test = stack_test[t['AD_status'] == 'within_AD']
@@ -457,6 +536,8 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
         BA_values.append(balanced_acc)
         Pre_values.append(pre_scores)
         removed_compounds_values.append((t['AD_status'] == 'outside_AD').sum())
+        dk_values.append(dk)
+        sk_values.append(sk)
     k_values   = np.array(k_values)
     MCC_values = np.array(MCC_values)
     ACC_values = np.array(ACC_values)
@@ -466,18 +547,36 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     F1_values  = np.array(F1_values)
     BA_values  = np.array(BA_values)
     Pre_values = np.array(Pre_values)
+    dk_values  = np.array(dk_values)
+    sk_values  = np.array(sk_values)
     removed_compounds_values = np.array(removed_compounds_values)
+    # Save table
+    ad_metrics = pd.DataFrame({
+        "k": k_values[:len(MCC_values)],  # Adjust if some values are skipped
+        "Accuracy": ACC_values,
+        "Balanced Accuracy": BA_values,
+        "Sensitivity": Sen_values,
+        "Specificity": Spe_values,
+        "MCC": MCC_values,
+        "AUC": AUC_values,
+        "Precision": Pre_values,
+        "F1 Score": F1_values,
+        "Removed Compounds": removed_compounds_values,
+        "dk_values": dk_values,
+        "sk_values": sk_values
+    })
+    ad_metrics = round(ad_metrics, 3)
+    ad_metrics.to_csv("AD_metrics_"+name+"_"+ str(z)+ ".csv")
     # Plotting
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6, 3))
     
-    ax1.plot(k_values, ACC_values, 'kp-', label = "Accuracy")
+    ax1.plot(k_values, BA_values,  'bo-',  label = "BACC")
     ax1.plot(k_values, Sen_values, 'gs-', label = "Sensitivity")
     ax1.plot(k_values, Spe_values, 'y*-', label = "Specificity")
     ax1.plot(k_values, MCC_values, 'r^-', label = "MCC")
     ax1.plot(k_values, AUC_values, 'md-', label = "AUC")
-    ax1.plot(k_values, BA_values, 'bo-',  label = "BACC")
     ax1.plot(k_values, AUC_values, 'cD-', label = "Precision")
-    ax1.plot(k_values, F1_values, 'cX-',  label = "F1")
+    ax1.plot(k_values, F1_values,  'cX-',  label = "F1")
     # Adding labels and title
     ax1.set_xlabel('k',      fontsize=12, fontstyle='italic',weight="bold")
     ax1.set_ylabel('Scores', fontsize=12, fontstyle='italic', weight='bold')
@@ -489,7 +588,7 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     ax2.set_ylabel('Removed compounds', fontsize=12, fontstyle='italic', weight='bold')
     ax2.set_xticks(k_values)
     plt.tight_layout()
-    plt.savefig("AD_ToxSTK_"+name+"_"+ str(z)+ "_Classification_separated.svg", bbox_inches='tight') 
+    plt.savefig("AD_"+name+"_"+ str(z)+ "_Classification_separated.svg", bbox_inches='tight') 
     plt.close
 
 def y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name):
