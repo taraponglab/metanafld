@@ -1,0 +1,121 @@
+Fitting 5 folds for each of 12 candidates, totalling 60 fits
+Best parameters found:  {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 200}
+Best AUC found:  0.5292857142857142
+finish train  nafld
+
+# feature importance
+         Feature  Importance
+6   ypc_pred_xgb    2.643962
+5    yke_pred_rf    2.143520
+3   yes_pred_xgb    1.781261
+11  ykc_pred_xgb    1.230689
+9   ycd_pred_xgb    1.183217
+7   yss_pred_svc    1.035888
+14   yac_pred_rf    0.990633
+4   yes_pred_svc    0.930325
+1   yat_pred_xgb    0.781459
+15  yac_pred_xgb    0.778652
+finish top features  nafld
+
+# AD
+k =  1 z= 0.5
+dk =  1.4991939933684781
+sk =  1.0986185984195473
+AD_status
+within_AD     16
+outside_AD     6
+Name: count, dtype: int64
+16 16 16
+Test set
+ACC:  0.875 Sen:  0.9166666666666666 Spe:  0.75 MCC:  0.667 AUC:  0.8333333333333334 BA:  0.833 Pre: 0.917 F1:  0.875
+k =  2 z= 0.5
+dk =  1.531773003653859
+sk =  1.1128719019376159
+AD_status
+within_AD     15
+outside_AD     7
+Name: count, dtype: int64
+15 15 15
+Test set
+ACC:  0.867 Sen:  0.9166666666666666 Spe:  0.6666666666666666 MCC:  0.583 AUC:  0.7916666666666667 BA:  0.792 Pre: 0.917 F1:  0.867
+k =  3 z= 0.5
+dk =  1.5587295284317781
+sk =  1.1290318409371132
+AD_status
+within_AD     15
+outside_AD     7
+Name: count, dtype: int64
+15 15 15
+Test set
+ACC:  0.867 Sen:  0.9166666666666666 Spe:  0.6666666666666666 MCC:  0.583 AUC:  0.7916666666666667 BA:  0.792 Pre: 0.917 F1:  0.867
+k =  4 z= 0.5
+dk =  1.5798522075344357
+sk =  1.1409098325678084
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+k =  5 z= 0.5
+dk =  1.5960750432477284
+sk =  1.1508173588400752
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+k =  6 z= 0.5
+dk =  1.674880354137561
+sk =  1.0705813725436681
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+k =  7 z= 0.5
+dk =  1.7342465978895036
+sk =  1.0190315224997548
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+k =  8 z= 0.5
+dk =  1.7876002876505945
+sk =  0.9777422974065441
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+k =  9 z= 0.5
+dk =  1.833659684342532
+sk =  0.9468975444921303
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+k =  10 z= 0.5
+dk =  1.8743869519075553
+sk =  0.9230775000565659
+AD_status
+within_AD     14
+outside_AD     8
+Name: count, dtype: int64
+14 14 14
+Test set
+ACC:  0.857 Sen:  0.9166666666666666 Spe:  0.5 MCC:  0.417 AUC:  0.7083333333333333 BA:  0.708 Pre: 0.917 F1:  0.857
+finish ad  nafld

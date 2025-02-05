@@ -220,18 +220,18 @@ def stacked_class(name):
     ysc_pred_xgb_cv,    ysc_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
     yac_pred_xgb_cv,    yac_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
     yma_pred_xgb_cv,    yma_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
-    baseline_model_svc_at = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xat_train, y_train)
-    baseline_model_svc_ke = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xke_train, y_train)
-    baseline_model_svc_es = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xes_train, y_train)
-    baseline_model_svc_pc = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xpc_train, y_train)
-    baseline_model_svc_ss = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xss_train, y_train)
-    baseline_model_svc_cd = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xcd_train, y_train)
-    baseline_model_svc_cn = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xcn_train, y_train) #500
-    baseline_model_svc_kc = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xkc_train, y_train)
-    baseline_model_svc_ce = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xce_train, y_train)
-    baseline_model_svc_sc = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xsc_train, y_train)
-    baseline_model_svc_ac = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xac_train, y_train)
-    baseline_model_svc_ma = SVC(kernel='rbf',gamma=0.1,C=10,random_state=1).fit(xma_train, y_train)
+    baseline_model_svc_at = SVC(random_state=1).fit(xat_train, y_train)
+    baseline_model_svc_ke = SVC(random_state=1).fit(xke_train, y_train)
+    baseline_model_svc_es = SVC(random_state=1).fit(xes_train, y_train)
+    baseline_model_svc_pc = SVC(random_state=1).fit(xpc_train, y_train)
+    baseline_model_svc_ss = SVC(random_state=1).fit(xss_train, y_train)
+    baseline_model_svc_cd = SVC(random_state=1).fit(xcd_train, y_train)
+    baseline_model_svc_cn = SVC(random_state=1).fit(xcn_train, y_train) #500
+    baseline_model_svc_kc = SVC(random_state=1).fit(xkc_train, y_train)
+    baseline_model_svc_ce = SVC(random_state=1).fit(xce_train, y_train)
+    baseline_model_svc_sc = SVC(random_state=1).fit(xsc_train, y_train)
+    baseline_model_svc_ac = SVC(random_state=1).fit(xac_train, y_train)
+    baseline_model_svc_ma = SVC(random_state=1).fit(xma_train, y_train)
     dump(baseline_model_svc_at, os.path.join(name,"train", "baseline_model_svc_at.joblib"))
     dump(baseline_model_svc_ke, os.path.join(name,"train", "baseline_model_svc_ke.joblib"))
     dump(baseline_model_svc_es, os.path.join(name,"train", "baseline_model_svc_es.joblib"))
@@ -326,9 +326,7 @@ def stacked_class(name):
     stacked_xgb = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=1)
     
     param_grid = {
-    'max_depth': [3, 5],
-    'n_estimators': [100, 200],
-    'learning_rate': [0.01, 0.1, 0.2],
+    'max_depth': [5]
     }
     
     # Set up GridSearchCV
@@ -385,10 +383,14 @@ def stacked_class(name):
                             ysc_metric_rf_test, ysc_metric_xgb_test,    ysc_metric_svc_test,
                             yac_metric_rf_test, yac_metric_xgb_test,    yac_metric_svc_test,
                             yma_metric_rf_test, yma_metric_xgb_test,    yma_metric_svc_test, y_metric_stk_test],  axis=0)
+    # round number
+    metric_train = round(metric_train, 3)
+    metric_cv    = round(metric_cv, 3)
+    metric_test  = round(metric_test, 3)
     metric_train.to_csv(os.path.join( name, "metric_train.csv"))
     metric_cv   .to_csv(os.path.join( name, "metric_cv.csv"))
     metric_test .to_csv(os.path.join( name, "metric_test.csv"))
-    return stacked_model, stack_train, stack_cv, stack_test, metric_train, metric_test, metric_cv
+    return stacked_model, stack_train, stack_cv, stack_test, metric_train, metric_test, metric_cv, best_params
 
 
 def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
@@ -490,13 +492,13 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     plt.savefig("AD_ToxSTK_"+name+"_"+ str(z)+ "_Classification_separated.svg", bbox_inches='tight') 
     plt.close
 
-def y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, name):
+def y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name):
     MCC_test=[]
     MCC_train=[]
     for i in range(1,101):
       y_train=y_train.sample(frac=1,replace=False,random_state=0)
       y_test=y_test.sample(frac=1,replace=False,random_state=0)
-      model=RandomForestClassifier(max_depth=5, max_features=10,n_estimators=300).fit(stack_cv, y_train)
+      model=xgb.XGBClassifier(**best_params).fit(stack_cv, y_train)
       y_pred_MCCext=model.predict(stack_test)
       y_pred_MCCtrain=model.predict(stack_train)
       MCCext=matthews_corrcoef(y_test, y_pred_MCCext)
@@ -534,7 +536,7 @@ def plot_importance_xgb(model, name):
     plt.close()
 
 def main():
-    for name in ['nafld']: #, 
+    for name in ['nafld']:  
         print("#"*100) 
         print(name)
         y_train  = pd.read_csv(os.path.join(name,"train", "y_train.csv"), index_col=0)
@@ -543,13 +545,13 @@ def main():
         print(y_train)
         print("Y_test")
         print(y_test)
-        stacked_model, stack_train, stack_cv, stack_test, metric_train, metric_test, metric_cv = stacked_class(name)
+        stacked_model, stack_train, stack_cv, stack_test, metric_train, metric_test, metric_cv, best_params = stacked_class(name)
         print("finish train ", name)
-        y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, name)
+        y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name)
         print("finish yrandom ", name)
         plot_importance_xgb(stacked_model, name)
         print("finish top features ", name)
-        run_ad(stacked_model, stack_cv, stack_test, y_test, name, z=1)
+        run_ad(stacked_model, stack_cv, stack_test, y_test, name, z=0.5)
         print("finish ad ", name)
 if __name__ == "__main__":
     main()

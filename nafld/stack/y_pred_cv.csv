@@ -1,7 +1,7 @@
 Name,y_pred_stacked
 PCB 126,0
 Aroclor 1260,0
-Pirfenidone,0
+Pirfenidone,1
 Quercetin,1
 Chrysin,1
 Chlorogenic acid,1
@@ -13,10 +13,10 @@ Cholic acid,1
 Ursodexycholic acid,1
 Obeticholic acid,1
 Aramchol,1
-Vitamin D3,0
+Vitamin D3,1
 Dihydrotestosterone,1
 Caffeine,1
-Rapamycin,0
+Rapamycin,1
 Silibinin,1
 Silymarin,1
 Tetracycline,0
@@ -27,13 +27,13 @@ Fructose,0
 Doxorubicin,0
 Microcystin-LR,0
 LPS,0
-Resveratrol,0
+Resveratrol,1
 Thioacetamide,0
 Palmitoleic acid,1
 Oleic acid,1
 10-nitrooleic acid,0
 Diethylnitrosamine,0
-Carbon tetrachloride,1
+Carbon tetrachloride,0
 Methionine,0
 MSG,0
 PFOS,0
