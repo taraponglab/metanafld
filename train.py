@@ -72,6 +72,14 @@ def y_prediction_cv(model, x_train, y_train, col_name):
     }, index=[col_name])
     return y_pred, metrics
 
+def shap_plot(stacked_model, stack_test, name):
+    explainer = shap.Explainer(stacked_model)
+    shap_values = explainer(stack_test)
+    shap.summary_plot(shap_values, stack_test, show=False, plot_type="bar", plot_size=(3, 5))
+    plt.xlabel("mean|SHAP|", fontsize=12, fontstyle='italic',weight="bold")
+    plt.savefig(name+'_shap.pdf', bbox_inches='tight')
+    plt.close()
+
 def stacked_class(name):
     xat_train = pd.read_csv(os.path.join(name, "train", 'xat_train.csv'), index_col=0)
     xes_train = pd.read_csv(os.path.join(name, "train", 'xes_train.csv'), index_col=0)
@@ -280,6 +288,11 @@ def stacked_class(name):
     ysc_pred_svc_cv,    ysc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
     yac_pred_svc_cv,    yac_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
     yma_pred_svc_cv,    yma_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
+    
+    # Shap EState
+    shap_plot(baseline_model_xgb_es, xes_test, "XGB_EState")
+    print("finished Baseline with SHAP")
+    print("#"*100)
     print("Stacking")
     #stack
     stack_train =pd.concat([yat_pred_rf_train, yat_pred_xgb_train, yat_pred_svc_train,
@@ -318,6 +331,7 @@ def stacked_class(name):
                             ysc_pred_rf_test,  ysc_pred_xgb_test,  ysc_pred_svc_test,
                             yac_pred_rf_test,  yac_pred_xgb_test,  yac_pred_svc_test,
                             yma_pred_rf_test,  yma_pred_xgb_test,  yma_pred_svc_test,],  axis=1)
+    
     #save stack original
     stack_train.to_csv(os.path.join( name, 'stack', "stacked_train.csv"))
     stack_cv.to_csv(os.path.join(    name, 'stack', "stacked_cv.csv"))
@@ -507,6 +521,7 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     for i in k_values:
         print('k = ', i, 'z=', str(z))
         t, dk, sk = nearest_neighbor_AD(stack_cv, stack_test, name, i, z=z)
+        t.to_csv("AD_test_set_"+str(i)+".csv")
         print(t['AD_status'].value_counts())
         # Remove outside AD
         x_ad_test = stack_test[t['AD_status'] == 'within_AD']
@@ -618,7 +633,7 @@ def y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, m
     ax.legend(loc='lower right',fontsize='small')
     # Adjust layout
     plt.tight_layout()
-    plt.savefig("Y-randomization-"+name+"-classification.svg", bbox_inches='tight')
+    plt.savefig("Y-randomization-"+name+"-classification.pdf", bbox_inches='tight')
     # Show the plots
     plt.close()
 
@@ -631,9 +646,17 @@ def plot_importance_xgb(model, name):
     plt.xlabel("Importance scores", fontsize=12, fontstyle='italic',weight="bold")
     plt.ylabel("Features", fontsize=12, fontstyle='italic',weight="bold")
     plt.tight_layout()
-    plt.savefig('top_features_xgb_'+name+'.svg', bbox_inches='tight')
+    plt.savefig('top_features_xgb_'+name+'.pdf', bbox_inches='tight')
     plt.close()
-
+    
+def shap_plot(stacked_model, stack_test, name):
+    explainer = shap.Explainer(stacked_model)
+    shap_values = explainer(stack_test)
+    shap.summary_plot(shap_values, stack_test, show=False, plot_type="bar", plot_size=(3, 5))
+    plt.xlabel("mean|SHAP|", fontsize=12, fontstyle='italic',weight="bold")
+    plt.savefig(name+'_shap.pdf', bbox_inches='tight')
+    plt.close()
+    
 def main():
     for name in ['nafld']:  
         print("#"*100) 
@@ -646,12 +669,15 @@ def main():
         print(y_test)
         stacked_model, stack_train, stack_cv, stack_test, metric_train, metric_test, metric_cv, best_params = stacked_class(name)
         print("finish train ", name)
+        shap_plot(stacked_model, stack_test, "XGB_stacked")
+        print("finished shap", name)
         y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name)
         print("finish yrandom ", name)
         plot_importance_xgb(stacked_model, name)
         print("finish top features ", name)
         run_ad(stacked_model, stack_cv, stack_test, y_test, name, z=0.5)
         print("finish ad ", name)
+        
 if __name__ == "__main__":
     main()
         
