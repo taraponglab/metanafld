@@ -5,7 +5,6 @@ from padelpy import padeldescriptor
 from rdkit.Chem import AllChem as Chem
 from rdkit import DataStructs
 import os
-import custom_preprocessing as cp
 from glob import glob
 from astartes.molecules import train_test_split_molecules
 
