@@ -2,7 +2,7 @@ from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
 # Define the SMILES string
-smi = r' C/C(=C\C=C\C=C(/C)\C=C\C=C(/C)\C(=O)C[C@]12[C@](O1)(C[C@H](CC2(C)C)O)C)/C=C/C=C(\C)/C=C=C3[C@](C[C@H](CC3(C)C)OC(=O)C)(C)O  '  # Example structure
+smi = r' CN(CCOC1=CC=C(C=C1)CC2C(=O)NC(=O)S2)C3=CC=CC=N3'  # Example structure
 mol = Chem.MolFromSmiles(smi)
 
 # Define EState SMARTS patterns and their corresponding colors (Approximations)
@@ -51,5 +51,5 @@ rdMolDraw2D.PrepareAndDrawMolecule(d, mol,
 
 # Save the drawing as an image file
 d.FinishDrawing()
-with open("Fucoxanthin_highlighted.png", "wb") as f:
+with open("Rosiglitazone_highlighted.png", "wb") as f:
     f.write(d.GetDrawingText())  # Write the drawing to file
