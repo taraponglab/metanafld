@@ -1,2 +1,0 @@
-,BACC,Sensitivity,Specificity,MCC,AUC,Precision,F1 Score,Fold
-yce_pred_xgb_fold3,0.5,1.0,0.0,0.0,0.5,0.6,0.75,3

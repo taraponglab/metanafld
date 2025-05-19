@@ -78,8 +78,8 @@ def y_prediction_cv(model, x_train, y_train, col_name):
             'Fold': [fold+1]
         }, index=[col_name + f"_fold{fold+1}"])
         # Save predictions and metrics for this fold
-        y_pred.to_csv(f"{col_name}_fold{fold+1}_pred.csv")
-        metrics.to_csv(f"{col_name}_fold{fold+1}_metrics.csv")
+        #y_pred.to_csv(f"{col_name}_fold{fold+1}_pred.csv")
+        #metrics.to_csv(f"{col_name}_fold{fold+1}_metrics.csv")
         fold_preds.append(y_pred)
         fold_metrics.append(metrics)
     # Aggregate predictions and metrics
@@ -131,8 +131,8 @@ def y_prediction_loocv(model, x_train, y_train, col_name):
         }, index=[col_name + f"_LOO{fold + 1}"])
 
         # Save predictions and metrics for this fold
-        y_pred_df.to_csv(f"{col_name}_LOO{fold + 1}_pred.csv")
-        metrics.to_csv(f"{col_name}_LOO{fold + 1}_metrics.csv")
+        #y_pred_df.to_csv(f"{col_name}_LOO{fold + 1}_pred.csv")
+        #metrics.to_csv(f"{col_name}_LOO{fold + 1}_metrics.csv")
 
         fold_preds.append(y_pred_df)
         fold_metrics.append(metrics)
@@ -254,6 +254,7 @@ def stacked_class(name):
     baseline_model_rf_sc = RandomForestClassifier(max_depth=5, random_state=1).fit(xsc_train, y_train)
     baseline_model_rf_ac = RandomForestClassifier(max_depth=5, random_state=1).fit(xac_train, y_train)
     baseline_model_rf_ma = RandomForestClassifier(max_depth=5, random_state=1).fit(xma_train, y_train)
+    
     dump(baseline_model_rf_at, os.path.join(name, "baseline_model_rf_at.joblib"))
     dump(baseline_model_rf_ke, os.path.join(name, "baseline_model_rf_ke.joblib"))
     dump(baseline_model_rf_es, os.path.join(name, "baseline_model_rf_es.joblib"))
@@ -698,7 +699,7 @@ def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
     df = pd.DataFrame(AD_status, index=x_test.index, columns=['AD_status'])
     return df, dk, sk
 
-def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
+def run_ad(stacked_model, stack_train, stack_train, y_train, name, z = 0.5):
     # Initialize lists to store metrics for plotting
     k_values = [3, 4, 5, 6, 7, 8, 9, 10]
     MCC_values = []
@@ -716,26 +717,26 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     # Remove outside AD
     for i in k_values:
         print('k = ', i, 'z=', str(z))
-        t, dk, sk = nearest_neighbor_AD(stack_cv, stack_test, name, i, z=z)
-        t.to_csv("AD_test_set_"+str(i)+".csv")
+        t, dk, sk = nearest_neighbor_AD(stack_train, stack_train, name, i, z=z)
+        t.to_csv("AD_train_set_"+str(i)+".csv")
         print(t['AD_status'].value_counts())
         # Remove outside AD
-        x_ad_test = stack_test[t['AD_status'] == 'within_AD']
-        y_ad_test = y_test.loc[x_ad_test.index]
-        y_pred_test = stacked_model.predict(x_ad_test)
-        print(len(x_ad_test),len(y_ad_test), len(y_pred_test) )
+        x_ad_train = stack_train[t['AD_status'] == 'within_AD']
+        y_ad_train = y_train.loc[x_ad_train.index]
+        y_pred_test = stacked_model.predict(x_ad_train)
+        print(len(x_ad_train),len(y_ad_train), len(y_pred_test) )
         # Evaluation
         print('Test set')
-        accuracy = round(accuracy_score(y_ad_test, y_pred_test), 3)
-        conf_matrix = confusion_matrix(y_ad_test, y_pred_test)
-        F1 = round(f1_score(y_ad_test, y_pred_test, average='weighted'), 3)
+        accuracy = round(accuracy_score(y_ad_train, y_pred_test), 3)
+        conf_matrix = confusion_matrix(y_ad_train, y_pred_test)
+        F1 = round(f1_score(y_ad_train, y_pred_test, average='weighted'), 3)
         tn, fp, fn, tp = conf_matrix.ravel()
         sensitivity = tp / (tp + fn)
         specificity = tn / (tn + fp)
-        auc = roc_auc_score(y_ad_test, y_pred_test)
-        mcc = round(matthews_corrcoef(y_ad_test, y_pred_test), 3)
-        balanced_acc = round(balanced_accuracy_score(y_ad_test, y_pred_test), 3)
-        pre_scores = round(precision_score(y_ad_test, y_pred_test), 3)
+        auc = roc_auc_score(y_ad_train, y_pred_test)
+        mcc = round(matthews_corrcoef(y_ad_train, y_pred_test), 3)
+        balanced_acc = round(balanced_accuracy_score(y_ad_train, y_pred_test), 3)
+        pre_scores = round(precision_score(y_ad_train, y_pred_test), 3)
         print('ACC: ', accuracy, 'Sen: ', sensitivity, 'Spe: ', specificity, 'MCC: ', mcc,'AUC: ', auc,'BA: ', balanced_acc, 'Pre:', pre_scores, 'F1: ', F1)
         # Store metrics for plotting
         MCC_values.append(mcc)
@@ -802,16 +803,15 @@ def run_ad(stacked_model, stack_cv, stack_test, y_test, name, z = 0.5):
     plt.savefig("AD_"+name+"_"+ str(z)+ "_Classification_separated.svg", bbox_inches='tight') 
     plt.close
 
-def y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name):
+def y_random(stack_train, stack_cv, y_train, metric_train, metric_test, best_params, name):
     MCC_test=[]
     MCC_train=[]
     for i in range(1,101):
       y_train=y_train.sample(frac=1,replace=False,random_state=0)
-      y_test=y_test.sample(frac=1,replace=False,random_state=0)
       model=xgb.XGBClassifier(**best_params).fit(stack_cv, y_train)
-      y_pred_MCCext=model.predict(stack_test)
+      y_pred_MCCext=model.predict(stack_train)
       y_pred_MCCtrain=model.predict(stack_train)
-      MCCext=matthews_corrcoef(y_test, y_pred_MCCext)
+      MCCext=matthews_corrcoef(y_train, y_pred_MCCext)
       MCC_test.append(MCCext)
       MCCtrain=matthews_corrcoef(y_train, y_pred_MCCtrain)
       MCC_train.append(MCCtrain)
