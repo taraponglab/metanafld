@@ -6,7 +6,6 @@ from rdkit.Chem import AllChem as Chem
 from rdkit import DataStructs
 import os
 from glob import glob
-from astartes.molecules import train_test_split_molecules
 
 def canonical_smiles(df, smiles_column):
     df['canonical_smiles'] = df[smiles_column].apply(lambda x: Chem.MolToSmiles(Chem.MolFromSmiles(x)))
@@ -74,7 +73,10 @@ def main():
         y_label = df['class'].values
         y_label = pd.DataFrame(y_label, columns=['class'], index=df.index)
         y_label.to_csv(os.path.join(i, 'y_label.csv'))
-        #fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(df, i)
+        fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(df, i)
+        # Combine all fingerprints into a single DataFrame
+        combined_fps = pd.concat([fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma], axis=1)
+        combined_fps.to_csv(os.path.join(i, 'combined_fps.csv'))
 if __name__ == "__main__":
     main()
     
