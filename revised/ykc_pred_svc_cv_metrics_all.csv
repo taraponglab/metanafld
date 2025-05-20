@@ -1,0 +1,6 @@
+,BACC,Sensitivity,Specificity,MCC,AUC,Precision,F1 Score,Fold
+ykc_pred_svc_fold1,0.5,1.0,0.0,0.0,0.5,0.6,0.75,1
+ykc_pred_svc_fold2,0.5,1.0,0.0,0.0,0.5,0.6,0.75,2
+ykc_pred_svc_fold3,0.5,1.0,0.0,0.0,0.5,0.6,0.75,3
+ykc_pred_svc_fold4,0.5,1.0,0.0,0.0,0.5,0.6,0.75,4
+ykc_pred_svc_fold5,0.5,1.0,0.0,0.0,0.5,0.6,0.75,5
