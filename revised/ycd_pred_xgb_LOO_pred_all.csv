@@ -1,6 +1,6 @@
 ,ycd_pred_xgb
 10-nitrooleic acid,0
-Acetaminophen,0
+Acetaminophen,1
 Alanyl-glutamine,0
 Allopurinol,0
 Aramchol,0
@@ -22,7 +22,7 @@ Diethylnitrosamine,1
 Dihydromyricetin,1
 Dihydrotestosterone,1
 Diosgenin,1
-Doxorubicin,1
+Doxorubicin,0
 Elafibranor,1
 Empagliflozin,1
 Epigallocatechin gallate,1
@@ -34,7 +34,7 @@ Gemigliptin,1
 Geniposide,1
 Glucose,0
 Gypenosides,1
-LPS,0
+LPS,1
 Lipoic acid,1
 Liraglutide,0
 MSG,0
@@ -47,7 +47,7 @@ Obeticholic acid,1
 Ochratoxin A,1
 Olanzapine,1
 Oleic acid,1
-Orotic acid,1
+Orotic acid,0
 PCB 126,0
 PFOS,1
 Palmitoleic acid,1
@@ -61,10 +61,10 @@ Scoparone,1
 Silibinin,1
 Silymarin,1
 Sodium Butyrate,1
-Streptozotocin,1
+Streptozotocin,0
 Sucrose,1
 Sulforaphane,0
-T0901317,1
+T0901317,0
 TCDD,0
 TMAO,1
 Tamoxifen,1

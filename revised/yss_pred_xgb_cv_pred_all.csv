@@ -18,7 +18,7 @@ Citicoline,1
 Clodronate,0
 Curcumin,1
 Dexamethasone,0
-Diethylnitrosamine,1
+Diethylnitrosamine,0
 Dihydromyricetin,1
 Dihydrotestosterone,0
 Diosgenin,1
@@ -28,10 +28,10 @@ Empagliflozin,1
 Epigallocatechin gallate,1
 Exenatide,1
 Fructose,0
-Fucoxanthin,1
+Fucoxanthin,0
 Gallic acid,0
 Gemigliptin,1
-Geniposide,1
+Geniposide,0
 Glucose,0
 Gypenosides,1
 LPS,1
@@ -45,14 +45,14 @@ Microcystin-LR,1
 Naringenin,1
 Obeticholic acid,0
 Ochratoxin A,1
-Olanzapine,1
+Olanzapine,0
 Oleic acid,1
 Orotic acid,1
 PCB 126,0
 PFOS,1
 Palmitoleic acid,1
 Pioglitazone,1
-Pirfenidone,1
+Pirfenidone,0
 Quercetin,1
 Rapamycin,1
 Resveratrol,1
@@ -63,7 +63,7 @@ Silymarin,1
 Sodium Butyrate,0
 Streptozotocin,0
 Sucrose,0
-Sulforaphane,1
+Sulforaphane,0
 T0901317,1
 TCDD,0
 TMAO,0

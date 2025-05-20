@@ -1,6 +1,6 @@
 Name,ypc_pred_xgb
 10-nitrooleic acid,1
-Acetaminophen,1
+Acetaminophen,0
 Alanyl-glutamine,0
 Allopurinol,1
 Aramchol,1
@@ -24,7 +24,7 @@ Dihydrotestosterone,0
 Diosgenin,1
 Doxorubicin,0
 Elafibranor,1
-Empagliflozin,0
+Empagliflozin,1
 Epigallocatechin gallate,1
 Exenatide,1
 Fructose,0
@@ -37,7 +37,7 @@ Gypenosides,0
 LPS,0
 Lipoic acid,1
 Liraglutide,1
-MSG,0
+MSG,1
 Melatonin,1
 Metformin,1
 Methionine,1

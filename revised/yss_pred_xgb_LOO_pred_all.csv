@@ -13,7 +13,7 @@ Caffeine,1
 Carbon tetrachloride,1
 Chlorogenic acid,1
 Cholic acid,1
-Chrysin,1
+Chrysin,0
 Citicoline,0
 Clodronate,1
 Curcumin,1
@@ -24,7 +24,7 @@ Dihydrotestosterone,1
 Diosgenin,1
 Doxorubicin,0
 Elafibranor,1
-Empagliflozin,0
+Empagliflozin,1
 Epigallocatechin gallate,1
 Exenatide,1
 Fructose,0
@@ -45,7 +45,7 @@ Microcystin-LR,1
 Naringenin,1
 Obeticholic acid,1
 Ochratoxin A,1
-Olanzapine,0
+Olanzapine,1
 Oleic acid,1
 Orotic acid,0
 PCB 126,0

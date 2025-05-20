@@ -2,7 +2,7 @@ Name,yke_pred_xgb
 10-nitrooleic acid,1
 Acetaminophen,0
 Alanyl-glutamine,1
-Allopurinol,0
+Allopurinol,1
 Aramchol,1
 Aroclor 1260,0
 Atorvastatin,1
@@ -33,8 +33,8 @@ Gallic acid,1
 Gemigliptin,1
 Geniposide,0
 Glucose,0
-Gypenosides,1
-LPS,1
+Gypenosides,0
+LPS,0
 Lipoic acid,1
 Liraglutide,1
 MSG,0

@@ -1,11 +1,11 @@
 Name,ysc_pred_xgb
 10-nitrooleic acid,0
 Acetaminophen,0
-Alanyl-glutamine,1
+Alanyl-glutamine,0
 Allopurinol,1
 Aramchol,1
 Aroclor 1260,0
-Atorvastatin,0
+Atorvastatin,1
 BPA,0
 Bavachinin,1
 Berberine,1
@@ -35,10 +35,10 @@ Geniposide,1
 Glucose,0
 Gypenosides,0
 LPS,1
-Lipoic acid,1
+Lipoic acid,0
 Liraglutide,1
 MSG,0
-Melatonin,0
+Melatonin,1
 Metformin,1
 Methionine,0
 Microcystin-LR,1
@@ -49,7 +49,7 @@ Olanzapine,1
 Oleic acid,0
 Orotic acid,1
 PCB 126,0
-PFOS,1
+PFOS,0
 Palmitoleic acid,1
 Pioglitazone,1
 Pirfenidone,0

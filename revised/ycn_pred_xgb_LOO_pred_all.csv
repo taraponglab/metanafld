@@ -13,7 +13,7 @@ Caffeine,1
 Carbon tetrachloride,1
 Chlorogenic acid,1
 Cholic acid,1
-Chrysin,1
+Chrysin,0
 Citicoline,1
 Clodronate,0
 Curcumin,1
@@ -31,16 +31,16 @@ Fructose,0
 Fucoxanthin,1
 Gallic acid,0
 Gemigliptin,1
-Geniposide,0
+Geniposide,1
 Glucose,0
 Gypenosides,0
 LPS,1
-Lipoic acid,0
+Lipoic acid,1
 Liraglutide,1
 MSG,0
 Melatonin,1
 Metformin,0
-Methionine,0
+Methionine,1
 Microcystin-LR,1
 Naringenin,1
 Obeticholic acid,0
@@ -61,7 +61,7 @@ Scoparone,1
 Silibinin,1
 Silymarin,1
 Sodium Butyrate,0
-Streptozotocin,0
+Streptozotocin,1
 Sucrose,0
 Sulforaphane,0
 T0901317,0

@@ -29,7 +29,7 @@ Epigallocatechin gallate,1
 Exenatide,1
 Fructose,0
 Fucoxanthin,1
-Gallic acid,1
+Gallic acid,0
 Gemigliptin,1
 Geniposide,0
 Glucose,0
@@ -40,14 +40,14 @@ Liraglutide,1
 MSG,0
 Melatonin,1
 Metformin,0
-Methionine,1
+Methionine,0
 Microcystin-LR,1
 Naringenin,1
 Obeticholic acid,0
 Ochratoxin A,1
 Olanzapine,1
 Oleic acid,1
-Orotic acid,0
+Orotic acid,1
 PCB 126,0
 PFOS,1
 Palmitoleic acid,1
@@ -64,7 +64,7 @@ Sodium Butyrate,0
 Streptozotocin,0
 Sucrose,0
 Sulforaphane,0
-T0901317,0
+T0901317,1
 TCDD,0
 TMAO,0
 Tamoxifen,1

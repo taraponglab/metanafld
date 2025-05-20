@@ -235,19 +235,21 @@ def stacked_class(name):
     xsc_train = pd.read_csv(os.path.join(name,'xsc.csv'), index_col=0)
     xac_train = pd.read_csv(os.path.join(name,'xac.csv'), index_col=0)
     xma_train = pd.read_csv(os.path.join(name,'xma.csv'), index_col=0)
+    xcj_train = pd.read_csv(os.path.join(name,'combined_fps.csv'), index_col=0)
     y_train   = pd.read_csv(os.path.join(name,"y_label.csv"), index_col=0)
-    baseline_model_rf_at = RandomForestClassifier(max_depth=5, random_state=1).fit(xat_train, y_train)
-    baseline_model_rf_ke = RandomForestClassifier(max_depth=5, random_state=1).fit(xke_train, y_train)
-    baseline_model_rf_es = RandomForestClassifier(max_depth=5, random_state=1).fit(xes_train, y_train)
-    baseline_model_rf_pc = RandomForestClassifier(max_depth=5, random_state=1).fit(xpc_train, y_train)
-    baseline_model_rf_ss = RandomForestClassifier(max_depth=5, random_state=1).fit(xss_train, y_train)
-    baseline_model_rf_cd = RandomForestClassifier(max_depth=5, random_state=1).fit(xcd_train, y_train)
-    baseline_model_rf_cn = RandomForestClassifier(max_depth=5, random_state=1).fit(xcn_train, y_train)
-    baseline_model_rf_kc = RandomForestClassifier(max_depth=5, random_state=1).fit(xkc_train, y_train)
-    baseline_model_rf_ce = RandomForestClassifier(max_depth=5, random_state=1).fit(xce_train, y_train)
-    baseline_model_rf_sc = RandomForestClassifier(max_depth=5, random_state=1).fit(xsc_train, y_train)
-    baseline_model_rf_ac = RandomForestClassifier(max_depth=5, random_state=1).fit(xac_train, y_train)
-    baseline_model_rf_ma = RandomForestClassifier(max_depth=5, random_state=1).fit(xma_train, y_train)
+    baseline_model_rf_at = RandomForestClassifier(random_state=None).fit(xat_train, y_train)
+    baseline_model_rf_ke = RandomForestClassifier(random_state=None).fit(xke_train, y_train)
+    baseline_model_rf_es = RandomForestClassifier(random_state=None).fit(xes_train, y_train)
+    baseline_model_rf_pc = RandomForestClassifier(random_state=None).fit(xpc_train, y_train)
+    baseline_model_rf_ss = RandomForestClassifier(random_state=None).fit(xss_train, y_train)
+    baseline_model_rf_cd = RandomForestClassifier(random_state=None).fit(xcd_train, y_train)
+    baseline_model_rf_cn = RandomForestClassifier(random_state=None).fit(xcn_train, y_train)
+    baseline_model_rf_kc = RandomForestClassifier(random_state=None).fit(xkc_train, y_train)
+    baseline_model_rf_ce = RandomForestClassifier(random_state=None).fit(xce_train, y_train)
+    baseline_model_rf_sc = RandomForestClassifier(random_state=None).fit(xsc_train, y_train)
+    baseline_model_rf_ac = RandomForestClassifier(random_state=None).fit(xac_train, y_train)
+    baseline_model_rf_ma = RandomForestClassifier(random_state=None).fit(xma_train, y_train)
+    baseline_model_rf_cj = RandomForestClassifier(random_state=None).fit(xcj_train, y_train)
     
     dump(baseline_model_rf_at, os.path.join(name, "baseline_model_rf_at.joblib"))
     dump(baseline_model_rf_ke, os.path.join(name, "baseline_model_rf_ke.joblib"))
@@ -261,6 +263,7 @@ def stacked_class(name):
     dump(baseline_model_rf_sc, os.path.join(name, "baseline_model_rf_sc.joblib"))
     dump(baseline_model_rf_ac, os.path.join(name, "baseline_model_rf_ac.joblib"))
     dump(baseline_model_rf_ma, os.path.join(name, "baseline_model_rf_ma.joblib"))
+    dump(baseline_model_rf_cj, os.path.join(name, "baseline_model_rf_cj.joblib"))
     
     yat_pred_rf_train, yat_metric_rf_train = y_prediction(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
     yes_pred_rf_train, yes_metric_rf_train = y_prediction(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
@@ -274,6 +277,7 @@ def stacked_class(name):
     ysc_pred_rf_train, ysc_metric_rf_train = y_prediction(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
     yac_pred_rf_train, yac_metric_rf_train = y_prediction(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
     yma_pred_rf_train, yma_metric_rf_train = y_prediction(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
+    ycj_pred_rf_train, ycj_metric_rf_train = y_prediction(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
     
     yat_pred_rf_cv,    yat_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
     yes_pred_rf_cv,    yes_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
@@ -287,6 +291,7 @@ def stacked_class(name):
     ysc_pred_rf_cv,    ysc_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
     yac_pred_rf_cv,    yac_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
     yma_pred_rf_cv,    yma_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
+    ycj_pred_rf_cv,    ycj_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
     
     plot_auc_auprc_cv(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
     plot_auc_auprc_cv(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
@@ -300,6 +305,7 @@ def stacked_class(name):
     plot_auc_auprc_cv(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
     plot_auc_auprc_cv(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
     plot_auc_auprc_cv(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
+    plot_auc_auprc_cv(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
     
     yat_pred_rf_loocv,    yat_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
     yes_pred_rf_loocv,    yes_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
@@ -313,19 +319,24 @@ def stacked_class(name):
     ysc_pred_rf_loocv,    ysc_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
     yac_pred_rf_loocv,    yac_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
     yma_pred_rf_loocv,    yma_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
+    ycj_pred_rf_loocv,    ycj_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
+
     #XGB
-    baseline_model_xgb_at = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xat_train, y_train)
-    baseline_model_xgb_ke = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xke_train, y_train)
-    baseline_model_xgb_es = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xes_train, y_train)
-    baseline_model_xgb_pc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xpc_train, y_train)
-    baseline_model_xgb_ss = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xss_train, y_train)
-    baseline_model_xgb_cd = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xcd_train, y_train)
-    baseline_model_xgb_cn = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xcn_train, y_train)
-    baseline_model_xgb_kc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xkc_train, y_train)
-    baseline_model_xgb_ce = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xce_train, y_train)
-    baseline_model_xgb_sc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xsc_train, y_train)
-    baseline_model_xgb_ac = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xac_train, y_train)
-    baseline_model_xgb_ma = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', max_depth=5, random_state=1).fit(xma_train, y_train)
+    baseline_model_xgb_at = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xat_train, y_train)
+    baseline_model_xgb_ke = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xke_train, y_train)
+    baseline_model_xgb_es = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xes_train, y_train)
+    baseline_model_xgb_pc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xpc_train, y_train)
+    baseline_model_xgb_ss = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xss_train, y_train)
+    baseline_model_xgb_cd = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xcd_train, y_train)
+    baseline_model_xgb_cn = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xcn_train, y_train)
+    baseline_model_xgb_kc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xkc_train, y_train)
+    baseline_model_xgb_ce = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xce_train, y_train)
+    baseline_model_xgb_sc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xsc_train, y_train)
+    baseline_model_xgb_ac = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xac_train, y_train)
+    baseline_model_xgb_ma = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xma_train, y_train)
+    baseline_model_xgb_cj = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xcj_train, y_train)
+
+
     dump(baseline_model_xgb_at, os.path.join(name, "baseline_model_xgb_at.joblib"))
     dump(baseline_model_xgb_ke, os.path.join(name, "baseline_model_xgb_ke.joblib"))
     dump(baseline_model_xgb_es, os.path.join(name, "baseline_model_xgb_es.joblib"))
@@ -338,6 +349,7 @@ def stacked_class(name):
     dump(baseline_model_xgb_sc, os.path.join(name, "baseline_model_xgb_sc.joblib"))
     dump(baseline_model_xgb_ac, os.path.join(name, "baseline_model_xgb_ac.joblib"))
     dump(baseline_model_xgb_ma, os.path.join(name, "baseline_model_xgb_ma.joblib"))
+    dump(baseline_model_xgb_cj, os.path.join(name, "baseline_model_xgb_cj.joblib"))
     
     yat_pred_xgb_train, yat_metric_xgb_train = y_prediction(   baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
     yes_pred_xgb_train, yes_metric_xgb_train = y_prediction(   baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
@@ -351,6 +363,7 @@ def stacked_class(name):
     ysc_pred_xgb_train, ysc_metric_xgb_train = y_prediction(   baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
     yac_pred_xgb_train, yac_metric_xgb_train = y_prediction(   baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
     yma_pred_xgb_train, yma_metric_xgb_train = y_prediction(   baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
+    ycj_pred_xgb_train, ycj_metric_xgb_train = y_prediction(   baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
     
     plot_auc_auprc_cv(   baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
     plot_auc_auprc_cv(   baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
@@ -364,6 +377,7 @@ def stacked_class(name):
     plot_auc_auprc_cv(   baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
     plot_auc_auprc_cv(   baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
     plot_auc_auprc_cv(   baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
+    plot_auc_auprc_cv(   baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
     
     yat_pred_xgb_cv,    yat_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
     yes_pred_xgb_cv,    yes_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
@@ -377,6 +391,7 @@ def stacked_class(name):
     ysc_pred_xgb_cv,    ysc_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
     yac_pred_xgb_cv,    yac_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
     yma_pred_xgb_cv,    yma_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
+    ycj_pred_xgb_cv,    ycj_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
     
     yat_pred_xgb_loocv,    yat_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
     yes_pred_xgb_loocv,    yes_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
@@ -390,19 +405,25 @@ def stacked_class(name):
     ysc_pred_xgb_loocv,    ysc_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
     yac_pred_xgb_loocv,    yac_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
     yma_pred_xgb_loocv,    yma_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
+    ycj_pred_xgb_loocv,    ycj_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
+
+
     #SVC
-    baseline_model_svc_at = SVC(random_state=1).fit(xat_train, y_train)
-    baseline_model_svc_ke = SVC(random_state=1).fit(xke_train, y_train)
-    baseline_model_svc_es = SVC(random_state=1).fit(xes_train, y_train)
-    baseline_model_svc_pc = SVC(random_state=1).fit(xpc_train, y_train)
-    baseline_model_svc_ss = SVC(random_state=1).fit(xss_train, y_train)
-    baseline_model_svc_cd = SVC(random_state=1).fit(xcd_train, y_train)
-    baseline_model_svc_cn = SVC(random_state=1).fit(xcn_train, y_train)
-    baseline_model_svc_kc = SVC(random_state=1).fit(xkc_train, y_train)
-    baseline_model_svc_ce = SVC(random_state=1).fit(xce_train, y_train)
-    baseline_model_svc_sc = SVC(random_state=1).fit(xsc_train, y_train)
-    baseline_model_svc_ac = SVC(random_state=1).fit(xac_train, y_train)
-    baseline_model_svc_ma = SVC(random_state=1).fit(xma_train, y_train)
+    baseline_model_svc_at = SVC(random_state=None).fit(xat_train, y_train)
+    baseline_model_svc_ke = SVC(random_state=None).fit(xke_train, y_train)
+    baseline_model_svc_es = SVC(random_state=None).fit(xes_train, y_train)
+    baseline_model_svc_pc = SVC(random_state=None).fit(xpc_train, y_train)
+    baseline_model_svc_ss = SVC(random_state=None).fit(xss_train, y_train)
+    baseline_model_svc_cd = SVC(random_state=None).fit(xcd_train, y_train)
+    baseline_model_svc_cn = SVC(random_state=None).fit(xcn_train, y_train)
+    baseline_model_svc_kc = SVC(random_state=None).fit(xkc_train, y_train)
+    baseline_model_svc_ce = SVC(random_state=None).fit(xce_train, y_train)
+    baseline_model_svc_sc = SVC(random_state=None).fit(xsc_train, y_train)
+    baseline_model_svc_ac = SVC(random_state=None).fit(xac_train, y_train)
+    baseline_model_svc_ma = SVC(random_state=None).fit(xma_train, y_train)
+    baseline_model_svc_cj = SVC(random_state=None).fit(xcj_train, y_train)
+
+
     dump(baseline_model_svc_at, os.path.join(name, "baseline_model_svc_at.joblib"))
     dump(baseline_model_svc_ke, os.path.join(name, "baseline_model_svc_ke.joblib"))
     dump(baseline_model_svc_es, os.path.join(name, "baseline_model_svc_es.joblib"))
@@ -415,6 +436,7 @@ def stacked_class(name):
     dump(baseline_model_svc_sc, os.path.join(name, "baseline_model_svc_sc.joblib"))
     dump(baseline_model_svc_ac, os.path.join(name, "baseline_model_svc_ac.joblib"))
     dump(baseline_model_svc_ma, os.path.join(name, "baseline_model_svc_ma.joblib"))
+    dump(baseline_model_svc_cj, os.path.join(name, "baseline_model_svc_cj.joblib"))
     
     yat_pred_svc_train, yat_metric_svc_train = y_prediction(   baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
     yes_pred_svc_train, yes_metric_svc_train = y_prediction(   baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
@@ -428,6 +450,7 @@ def stacked_class(name):
     ysc_pred_svc_train, ysc_metric_svc_train = y_prediction(   baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
     yac_pred_svc_train, yac_metric_svc_train = y_prediction(   baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
     yma_pred_svc_train, yma_metric_svc_train = y_prediction(   baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
+    ycj_pred_svc_train, ycj_metric_svc_train = y_prediction(   baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
     
     plot_auc_auprc_cv(   baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
     plot_auc_auprc_cv(   baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
@@ -441,6 +464,7 @@ def stacked_class(name):
     plot_auc_auprc_cv(   baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
     plot_auc_auprc_cv(   baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
     plot_auc_auprc_cv(   baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
+    plot_auc_auprc_cv(   baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
     
     yat_pred_svc_cv,    yat_metric_svc_cv    = y_prediction_cv(baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
     yes_pred_svc_cv,    yes_metric_svc_cv    = y_prediction_cv(baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
@@ -454,6 +478,7 @@ def stacked_class(name):
     ysc_pred_svc_cv,    ysc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
     yac_pred_svc_cv,    yac_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
     yma_pred_svc_cv,    yma_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
+    ycj_pred_svc_cv,    ycj_metric_svc_cv    = y_prediction_cv(baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
     
     yat_pred_svc_loocv,    yat_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
     yes_pred_svc_loocv,    yes_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
@@ -467,9 +492,10 @@ def stacked_class(name):
     ysc_pred_svc_loocv,    ysc_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
     yac_pred_svc_loocv,    yac_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
     yma_pred_svc_loocv,    yma_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
-    
+    ycj_pred_svc_loocv,    ycj_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
+
     # Shap EState
-    shap_plot(baseline_model_xgb_es, xes_train, "XGB_EState")
+    #shap_plot(baseline_model_xgb_es, xes_train, "XGB_EState")
     print("finished Baseline with SHAP")
     print("#"*100)
     print("Stacking")
@@ -485,7 +511,8 @@ def stacked_class(name):
                             yce_pred_rf_train, yce_pred_xgb_train, yce_pred_svc_train,
                             ysc_pred_rf_train, ysc_pred_xgb_train, ysc_pred_svc_train,
                             yac_pred_rf_train, yac_pred_xgb_train, yac_pred_svc_train,
-                            yma_pred_rf_train, yma_pred_xgb_train, yma_pred_svc_train,],  axis=1)
+                            yma_pred_rf_train, yma_pred_xgb_train, yma_pred_svc_train,
+                            ycj_pred_rf_train, ycj_pred_xgb_train, ycj_pred_svc_train],  axis=1)
     stack_cv    =pd.concat([yat_pred_rf_cv,    yat_pred_xgb_cv,    yat_pred_svc_cv,
                             yes_pred_rf_cv,    yes_pred_xgb_cv,    yes_pred_svc_cv,
                             yke_pred_rf_cv,    yke_pred_xgb_cv,    yke_pred_svc_cv,
@@ -497,7 +524,8 @@ def stacked_class(name):
                             yce_pred_rf_cv,    yce_pred_xgb_cv,    yce_pred_svc_cv,
                             ysc_pred_rf_cv,    ysc_pred_xgb_cv,    ysc_pred_svc_cv,
                             yac_pred_rf_cv,    yac_pred_xgb_cv,    yac_pred_svc_cv,
-                            yma_pred_rf_cv,    yma_pred_xgb_cv,    yma_pred_svc_cv,],  axis=1)
+                            yma_pred_rf_cv,    yma_pred_xgb_cv,    yma_pred_svc_cv,
+                            ycj_pred_rf_cv,    ycj_pred_xgb_cv,    ycj_pred_svc_cv],  axis=1)
     stack_loocv =pd.concat([yat_pred_rf_loocv,  yat_pred_xgb_loocv,  yat_pred_svc_loocv,
                             yes_pred_rf_loocv,  yes_pred_xgb_loocv,  yes_pred_svc_loocv,
                             yke_pred_rf_loocv,  yke_pred_xgb_loocv,  yke_pred_svc_loocv,
@@ -509,13 +537,14 @@ def stacked_class(name):
                             yce_pred_rf_loocv,  yce_pred_xgb_loocv,  yce_pred_svc_loocv,
                             ysc_pred_rf_loocv,  ysc_pred_xgb_loocv,  ysc_pred_svc_loocv,
                             yac_pred_rf_loocv,  yac_pred_xgb_loocv,  yac_pred_svc_loocv,
-                            yma_pred_rf_loocv,  yma_pred_xgb_loocv,  yma_pred_svc_loocv,],  axis=1)
+                            yma_pred_rf_loocv,  yma_pred_xgb_loocv,  yma_pred_svc_loocv,
+                            ycj_pred_rf_loocv,  ycj_pred_xgb_loocv,  ycj_pred_svc_loocv],  axis=1)
 
     
     #save stack original
-    stack_train.to_csv(os.path.join( name, 'stack', "stacked_train.csv"))
-    stack_cv.to_csv(os.path.join(    name, 'stack', "stacked_cv.csv"))
-    stack_loocv.to_csv(os.path.join(  name, 'stack', "stacked_test.csv"))
+    stack_train.to_csv(os.path.join(  name, 'stack', "stacked_train.csv"))
+    stack_cv.to_csv(os.path.join(     name, 'stack', "stacked_cv.csv"))
+    stack_loocv.to_csv(os.path.join(  name, 'stack', "stacked_loocv.csv"))
     
     #Train
     stacked_xgb = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=1)
@@ -538,9 +567,9 @@ def stacked_class(name):
     
     dump(stacked_model, os.path.join(name, 'stack', "stacked_model.joblib"))
 
-    y_pred_stk_train,  y_metric_stk_train = y_prediction(   stacked_model, stack_train, y_train, "y_pred_stacked")
-    y_pred_stk_cv   ,  y_metric_stk_cv    = y_prediction(   stacked_model, stack_cv,    y_train, "y_pred_stacked")
-    y_pred_stk_loocv ,  y_metric_stk_loocv  = y_prediction(   stacked_model, stack_loocv, y_train,  "y_pred_stacked")
+    y_pred_stk_train ,  y_metric_stk_train   = y_prediction(   stacked_model, stack_train, y_train, "y_pred_stacked")
+    y_pred_stk_cv    ,  y_metric_stk_cv      = y_prediction(   stacked_model, stack_cv,    y_train, "y_pred_stacked")
+    y_pred_stk_loocv ,  y_metric_stk_loocv   =  y_prediction(   stacked_model, stack_loocv, y_train,  "y_pred_stacked")
     
     y_pred_stk_train.to_csv(os.path.join( name, 'stack', "y_pred_train.csv"))
     y_pred_stk_loocv.to_csv(os.path.join( name, 'stack', "y_pred_test.csv"))
@@ -558,7 +587,8 @@ def stacked_class(name):
                             yma_metric_rf_train,   
                             ypc_metric_rf_train,   
                             yss_metric_rf_train,   
-                            ysc_metric_rf_train,   
+                            ysc_metric_rf_train,
+                            ycj_metric_rf_train,   
                             yat_metric_svc_train,
                             yac_metric_svc_train,
                             ycn_metric_svc_train,
@@ -571,6 +601,7 @@ def stacked_class(name):
                             ypc_metric_svc_train,
                             yss_metric_svc_train,
                             ysc_metric_svc_train,
+                            ycj_metric_svc_train,
                             yat_metric_xgb_train,
                             yac_metric_xgb_train,
                             ycn_metric_xgb_train,
@@ -583,6 +614,7 @@ def stacked_class(name):
                             ypc_metric_xgb_train,
                             yss_metric_xgb_train,
                             ysc_metric_xgb_train,
+                            ycj_metric_xgb_train,
                             y_metric_stk_train],  axis=0)
     
     metric_cv  = pd.concat([yat_metric_rf_cv, 
@@ -596,7 +628,8 @@ def stacked_class(name):
                             yma_metric_rf_cv, 
                             ypc_metric_rf_cv, 
                             yss_metric_rf_cv, 
-                            ysc_metric_rf_cv,  
+                            ysc_metric_rf_cv,
+                            ycj_metric_rf_cv,  
                             yat_metric_svc_cv,
                             yac_metric_svc_cv,
                             ycn_metric_svc_cv,
@@ -609,6 +642,7 @@ def stacked_class(name):
                             ypc_metric_svc_cv,
                             yss_metric_svc_cv,
                             ysc_metric_svc_cv,
+                            ycj_metric_svc_cv,
                             yat_metric_xgb_cv,  
                             yac_metric_xgb_cv,  
                             ycn_metric_xgb_cv,  
@@ -620,7 +654,8 @@ def stacked_class(name):
                             yma_metric_xgb_cv,  
                             ypc_metric_xgb_cv,  
                             yss_metric_xgb_cv,  
-                            ysc_metric_xgb_cv,  
+                            ysc_metric_xgb_cv, 
+                            ycj_metric_xgb_cv, 
                             y_metric_stk_cv],  axis=0)
     
     metric_loocv  = pd.concat([yat_metric_rf_loocv, 
@@ -634,7 +669,8 @@ def stacked_class(name):
                             yma_metric_rf_loocv, 
                             ypc_metric_rf_loocv, 
                             yss_metric_rf_loocv, 
-                            ysc_metric_rf_loocv,  
+                            ysc_metric_rf_loocv, 
+                            ycj_metric_rf_loocv, 
                             yat_metric_svc_loocv,
                             yac_metric_svc_loocv,
                             ycn_metric_svc_loocv,
@@ -647,6 +683,7 @@ def stacked_class(name):
                             ypc_metric_svc_loocv,
                             yss_metric_svc_loocv,
                             ysc_metric_svc_loocv,
+                            ycj_metric_svc_loocv,
                             yat_metric_xgb_loocv,  
                             yac_metric_xgb_loocv,  
                             ycn_metric_xgb_loocv,  
@@ -658,7 +695,8 @@ def stacked_class(name):
                             yma_metric_xgb_loocv,  
                             ypc_metric_xgb_loocv,  
                             yss_metric_xgb_loocv,  
-                            ysc_metric_xgb_loocv,  
+                            ysc_metric_xgb_loocv,
+                            ycj_metric_xgb_loocv,  
                             y_metric_stk_loocv],  axis=0)
     
     # round number

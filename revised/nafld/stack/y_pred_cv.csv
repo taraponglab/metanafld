@@ -26,7 +26,7 @@ Doxorubicin,0
 Elafibranor,1
 Empagliflozin,0
 Epigallocatechin gallate,1
-Exenatide,1
+Exenatide,0
 Fructose,0
 Fucoxanthin,0
 Gallic acid,1
@@ -35,10 +35,10 @@ Geniposide,0
 Glucose,0
 Gypenosides,1
 LPS,1
-Lipoic acid,0
+Lipoic acid,1
 Liraglutide,1
 MSG,1
-Melatonin,0
+Melatonin,1
 Metformin,1
 Methionine,0
 Microcystin-LR,1
@@ -53,8 +53,8 @@ PFOS,0
 Palmitoleic acid,1
 Pioglitazone,1
 Pirfenidone,0
-Quercetin,0
-Rapamycin,1
+Quercetin,1
+Rapamycin,0
 Resveratrol,1
 Rosiglitazone,1
 Scoparone,1
