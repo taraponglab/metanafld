@@ -1,2 +1,0 @@
-,BACC,Accuracy,Sensitivity,Specificity,MCC,AUC,Precision,F1 Score
-ysc_pred_svc_LOO,0.5,0.6,1.0,0.0,0.0,0.5,0.6,0.75

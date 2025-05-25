@@ -11,29 +11,45 @@ import matplotlib.pyplot as plt
 import shap
 from sklearn.model_selection import GridSearchCV
 import seaborn as sns
+from sklearn.ensemble import StackingClassifier
+from sklearn.base import clone
 
-""" 
-1. Load x and y
-2. Train stacked model (BL + Stack + 5-CV) (save)
-3. Evaluate performance of all train, cv, test (save)
-4. SHAP (save)
-5. Y-random (save)
-6. AD (save)
-"""
+def remove_constant_string_des(df):
+    #delete string value
+    df = df.select_dtypes(exclude=['object'])
+    #delete constant value
+    for column in df.columns:
+        if df[column].nunique() == 1:  # This checks if the column has only one unique value
+            df = df.drop(column, axis=1)  # This drops the column from the DataFrame
+    return df
+
+def remove_highly_correlated_features(df, threshold=0.7):
+    # Compute pairwise correlation of columns
+    corr_matrix = df.corr().abs()
+    # Create a mask for the upper triangle
+    upper = corr_matrix.where(
+        pd.DataFrame(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool), 
+                     index=corr_matrix.index, columns=corr_matrix.columns)
+    )
+    # Identify columns to drop based on threshold
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
+    # Drop the columns from the DataFrame
+    df_dropped = df.drop(columns=to_drop)
+    return df_dropped
 
 
 def y_prediction(model, x_train, y_train, col_name):
     y_pred = pd.DataFrame(model.predict(x_train), columns=[col_name]).set_index(x_train.index)
-    acc = accuracy_score(y_train, y_pred)
-    sen = recall_score(y_train, y_pred)  # Sensitivity is the same as recall
-    mcc = matthews_corrcoef(y_train, y_pred)
-    f1  = f1_score(y_train, y_pred)
-    auc = roc_auc_score(y_train, y_pred)
-    bcc = balanced_accuracy_score(y_train, y_pred)
-    pre = precision_score(y_train, y_pred)
+    acc = round(accuracy_score(y_train, y_pred),3)
+    sen = round(recall_score(y_train, y_pred),3)
+    mcc = round(matthews_corrcoef(y_train, y_pred),3)
+    f1  = round(f1_score(y_train, y_pred),3)
+    auc = round(roc_auc_score(y_train, y_pred),3)
+    bcc = round(balanced_accuracy_score(y_train, y_pred),3)
+    prc = round(average_precision_score(y_train, y_pred),3)
     # Calculate specificity
     tn, fp, fn, tp = confusion_matrix(y_train, y_pred).ravel()
-    spc = tn / (tn + fp)
+    spc = round(tn / (tn + fp),3)
 
     # Create a DataFrame to store the metrics
     metrics = pd.DataFrame({
@@ -42,61 +58,39 @@ def y_prediction(model, x_train, y_train, col_name):
         'Sensitivity': [sen],
         'Specificity': [spc],
         'MCC': [mcc],
-        'AUC': [auc],
-        'Precision': [pre],
+        'AUROC': [auc],
+        'AUPRC': [prc],
         'F1 Score': [f1],
     }, index=[col_name])
     return y_pred, metrics
 
 def y_prediction_cv(model, x_train, y_train, col_name):
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    fold_preds = []
-    fold_metrics = []
-    
-    for fold, (train_idx, val_idx) in enumerate(skf.split(x_train, y_train)):
-        x_tr, x_val = x_train.iloc[train_idx], x_train.iloc[val_idx]
-        y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
-        model.fit(x_tr, y_tr)
-        y_pred = pd.DataFrame(model.predict(x_val), columns=[col_name], index=x_val.index)
-        # Calculate metrics
-        sen = recall_score(y_val, y_pred)
-        mcc = matthews_corrcoef(y_val, y_pred)
-        f1  = f1_score(y_val, y_pred)
-        auc = roc_auc_score(y_val, y_pred)
-        bcc = balanced_accuracy_score(y_val, y_pred)
-        pre = precision_score(y_val, y_pred)
-        tn, fp, fn, tp = confusion_matrix(y_val, y_pred).ravel()
-        spc = tn / (tn + fp)
-        metrics = pd.DataFrame({
-            'BACC': [bcc],
-            'Sensitivity': [sen],
-            'Specificity': [spc],
-            'MCC': [mcc],
-            'AUC': [auc],
-            'Precision': [pre],
-            'F1 Score': [f1],
-            'Fold': [fold+1]
-        }, index=[col_name + f"_fold{fold+1}"])
-        # Save predictions and metrics for this fold
-        #y_pred.to_csv(f"{col_name}_fold{fold+1}_pred.csv")
-        #metrics.to_csv(f"{col_name}_fold{fold+1}_metrics.csv")
-        fold_preds.append(y_pred)
-        fold_metrics.append(metrics)
-    # Aggregate predictions and metrics
-    y_pred_all = pd.concat(fold_preds).sort_index()
-    metrics_all = pd.concat(fold_metrics)
-    # Save all folds together
-    y_pred_all.to_csv(f"{col_name}_cv_pred_all.csv")
-    metrics_all.to_csv(f"{col_name}_cv_metrics_all.csv")
-    return y_pred_all, metrics_all
-
+    y_pred = cross_val_predict(model, x_train, y_train, cv=5)
+    acc = round(accuracy_score(y_train, y_pred),3)
+    sen = round(recall_score(y_train, y_pred),3)
+    mcc = round(matthews_corrcoef(y_train, y_pred),3)
+    f1  = round(f1_score(y_train, y_pred),3)
+    auc = round(roc_auc_score(y_train, y_pred),3)
+    bcc = round(balanced_accuracy_score(y_train, y_pred),3)
+    prc = round(average_precision_score(y_train, y_pred),3)
+    # Calculate specificity
+    tn, fp, fn, tp = confusion_matrix(y_train, y_pred).ravel()
+    spc = round(tn / (tn + fp),3)
+    # Create a DataFrame to store the metrics
+    metrics = pd.DataFrame({
+        'BACC': [bcc],
+        'Accuracy': [acc],
+        'Sensitivity': [sen],
+        'Specificity': [spc],
+        'MCC': [mcc],
+        'AUROC': [auc],
+        'AUPRC': [prc],
+        'F1 Score': [f1],
+    }, index=[col_name])
+    return y_pred, metrics
 
 
 def y_prediction_loocv(model, x_train, y_train, col_name):
-    """
-    Perform Leave-One-Out Cross-Validation, collect all predictions, then compute metrics on all predictions at once.
-    Metrics are not computed per fold, only for the full set.
-    """
     loo = LeaveOneOut()
     preds = []
     indices = []
@@ -114,15 +108,15 @@ def y_prediction_loocv(model, x_train, y_train, col_name):
     y_true_all = y_train.loc[y_pred_all.index]
 
     # Compute metrics on all predictions at once
-    acc = accuracy_score(y_true_all, y_pred_all)
-    sen = recall_score(y_true_all, y_pred_all)
-    mcc = matthews_corrcoef(y_true_all, y_pred_all)
-    f1  = f1_score(y_true_all, y_pred_all)
-    auc_val = roc_auc_score(y_true_all, y_pred_all)
-    bcc = balanced_accuracy_score(y_true_all, y_pred_all)
-    pre = precision_score(y_true_all, y_pred_all)
+    acc = round(accuracy_score(y_true_all, y_pred_all), 3)
+    sen = round(recall_score(y_true_all, y_pred_all), 3)
+    mcc = round(matthews_corrcoef(y_true_all, y_pred_all), 3)
+    f1  = round(f1_score(y_true_all, y_pred_all), 3)
+    auc = round(roc_auc_score(y_true_all, y_pred_all), 3)
+    bcc = round(balanced_accuracy_score(y_true_all, y_pred_all), 3)
+    prc = round(average_precision_score(y_true_all, y_pred_all), 3)
     tn, fp, fn, tp = confusion_matrix(y_true_all, y_pred_all).ravel()
-    spc = tn / (tn + fp)
+    spc = round(tn / (tn + fp), 3)
 
     metrics = pd.DataFrame({
         'BACC': [bcc],
@@ -130,15 +124,10 @@ def y_prediction_loocv(model, x_train, y_train, col_name):
         'Sensitivity': [sen],
         'Specificity': [spc],
         'MCC': [mcc],
-        'AUC': [auc_val],
-        'Precision': [pre],
+        'AUROC': [auc],
+        'AUPRC': [prc],
         'F1 Score': [f1],
-    }, index=[col_name + "_LOO"])
-
-    # Save predictions and metrics
-    y_pred_all.to_csv(f"{col_name}_LOO_pred_all.csv")
-    metrics.to_csv(f"{col_name}_LOO_metrics_all.csv")
-
+    }, index=[col_name])
     return y_pred_all, metrics
 
 
@@ -152,7 +141,7 @@ def plot_auc_auprc_cv(model, x_train, y_train, col_name):
     mean_recall = np.linspace(0, 1, 100)
 
     # ROC Curve
-    plt.figure(figsize=(6, 3))
+    plt.figure(figsize=(4, 3))
     for i, (train_idx, val_idx) in enumerate(skf.split(x_train, y_train)):
         x_tr, x_val = x_train.iloc[train_idx], x_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
@@ -165,7 +154,7 @@ def plot_auc_auprc_cv(model, x_train, y_train, col_name):
         fpr, tpr, _ = roc_curve(y_val, y_score)
         roc_auc = auc(fpr, tpr)
         aucs.append(roc_auc)
-        plt.plot(fpr, tpr, lw=1, alpha=0.7, label=f"Fold {i+1} (AUC = {roc_auc:.2f})")
+        plt.plot(fpr, tpr, lw=1, alpha=0.7, label=f"Fold {i+1} (AUC = {roc_auc:.3f})")
         # Interpolate tpr
         tprs.append(np.interp(mean_fpr, fpr, tpr))
         tprs[-1][0] = 0.0
@@ -173,18 +162,18 @@ def plot_auc_auprc_cv(model, x_train, y_train, col_name):
     mean_tpr = np.mean(tprs, axis=0)
     mean_auc = auc(mean_fpr, mean_tpr)
     std_auc = np.std(aucs)
-    plt.plot(mean_fpr, mean_tpr, color='b', label=f"Mean AUROC = {mean_auc:.2f} ± {std_auc:.2f}", lw=2)
+    plt.plot(mean_fpr, mean_tpr, color='b', label=f"Mean AUROC = {mean_auc:.3f} ± {std_auc:.3f}", lw=2)
     plt.plot([0, 1], [0, 1], linestyle='--', color='gray', lw=1)
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title(f"AUROC - {col_name}")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+    plt.xlabel("1-Specificity", fontsize=12, fontstyle='italic', weight="bold")
+    plt.ylabel("Sensitivity", fontsize=12, fontstyle='italic', weight="bold")
+    plt.title(f"AUROC - {col_name}", fontsize=12, fontstyle='italic', weight="bold")
+    plt.legend(bbox_to_anchor=(1,1), loc="upper left", fontsize='small')
     plt.tight_layout()
-    plt.savefig(os.path.join(f"{col_name}_roc_auc_cv.png"), dpi=500)
+    plt.savefig(os.path.join("graph_metrics",f"{col_name}_roc_auc_cv.png"), dpi=500)
     plt.close()
 
     # Precision-Recall Curve
-    plt.figure(figsize=(6, 3))
+    plt.figure(figsize=(5, 3))
     for i, (train_idx, val_idx) in enumerate(skf.split(x_train, y_train)):
         x_tr, x_val = x_train.iloc[train_idx], x_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
@@ -196,22 +185,23 @@ def plot_auc_auprc_cv(model, x_train, y_train, col_name):
         precision, recall, _ = precision_recall_curve(y_val, y_score)
         auprc = average_precision_score(y_val, y_score)
         auprcs.append(auprc)
-        plt.plot(recall, precision, lw=1, alpha=0.7, label=f"Fold {i+1} (AUPRC = {auprc:.2f})")
+        plt.plot(recall, precision, lw=1, alpha=0.7, label=f"Fold {i+1} (AUPRC = {auprc:.3f})")
         # Interpolate precision
         precisions.append(np.interp(mean_recall, recall[::-1], precision[::-1]))
     # Plot mean PRC
     mean_precision = np.mean(precisions, axis=0)
     mean_auprc = np.mean(auprcs)
     std_auprc = np.std(auprcs)
-    plt.plot(mean_recall, mean_precision, color='b', label=f"Mean AUPRC = {mean_auprc:.2f} ± {std_auprc:.2f}", lw=2)
-    plt.xlabel("Recall")
-    plt.ylabel("Precision")
-    plt.title(f"AUPRC - {col_name}")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+    plt.plot(mean_recall, mean_precision, color='b', label=f"Mean AUPRC = {mean_auprc:.3f} ± {std_auprc:.3f}", lw=2)
+    # Add [1,0] to [0,1] line
+    plt.plot([1, 0], [0, 1], linestyle='--', color='gray', lw=1)
+    plt.xlabel("Recall (Sensitivity)", fontsize=12, fontstyle='italic', weight="bold")
+    plt.ylabel("Precision", fontsize=12, fontstyle='italic', weight="bold")
+    plt.title(f"AUPRC - {col_name}", fontsize=12, fontstyle='italic', weight="bold")
+    plt.legend(bbox_to_anchor=(1,1), loc="upper left", fontsize='small')
     plt.tight_layout()
-    plt.savefig(os.path.join(f"{col_name}_prc_auprc_cv.png"), dpi=500)
+    plt.savefig(os.path.join("graph_metrics",f"{col_name}_prc_auprc_cv.png"), dpi=500)
     plt.close()
-
 
 
 def shap_plot(stacked_model, stack_test, name):
@@ -222,496 +212,9 @@ def shap_plot(stacked_model, stack_test, name):
     plt.savefig(name+'_shap.pdf', bbox_inches='tight')
     plt.close()
 
-def stacked_class(name):
-    xat_train = pd.read_csv(os.path.join(name,'xat.csv'), index_col=0)
-    xes_train = pd.read_csv(os.path.join(name,'xes.csv'), index_col=0)
-    xke_train = pd.read_csv(os.path.join(name,'xke.csv'), index_col=0)
-    xpc_train = pd.read_csv(os.path.join(name,'xpc.csv'), index_col=0)
-    xss_train = pd.read_csv(os.path.join(name,'xss.csv'), index_col=0)
-    xcd_train = pd.read_csv(os.path.join(name,'xcd.csv'), index_col=0)
-    xcn_train = pd.read_csv(os.path.join(name,'xcn.csv'), index_col=0)
-    xkc_train = pd.read_csv(os.path.join(name,'xkc.csv'), index_col=0)
-    xce_train = pd.read_csv(os.path.join(name,'xce.csv'), index_col=0)
-    xsc_train = pd.read_csv(os.path.join(name,'xsc.csv'), index_col=0)
-    xac_train = pd.read_csv(os.path.join(name,'xac.csv'), index_col=0)
-    xma_train = pd.read_csv(os.path.join(name,'xma.csv'), index_col=0)
-    xcj_train = pd.read_csv(os.path.join(name,'combined_fps.csv'), index_col=0)
-    y_train   = pd.read_csv(os.path.join(name,"y_label.csv"), index_col=0)
-    baseline_model_rf_at = RandomForestClassifier(random_state=None).fit(xat_train, y_train)
-    baseline_model_rf_ke = RandomForestClassifier(random_state=None).fit(xke_train, y_train)
-    baseline_model_rf_es = RandomForestClassifier(random_state=None).fit(xes_train, y_train)
-    baseline_model_rf_pc = RandomForestClassifier(random_state=None).fit(xpc_train, y_train)
-    baseline_model_rf_ss = RandomForestClassifier(random_state=None).fit(xss_train, y_train)
-    baseline_model_rf_cd = RandomForestClassifier(random_state=None).fit(xcd_train, y_train)
-    baseline_model_rf_cn = RandomForestClassifier(random_state=None).fit(xcn_train, y_train)
-    baseline_model_rf_kc = RandomForestClassifier(random_state=None).fit(xkc_train, y_train)
-    baseline_model_rf_ce = RandomForestClassifier(random_state=None).fit(xce_train, y_train)
-    baseline_model_rf_sc = RandomForestClassifier(random_state=None).fit(xsc_train, y_train)
-    baseline_model_rf_ac = RandomForestClassifier(random_state=None).fit(xac_train, y_train)
-    baseline_model_rf_ma = RandomForestClassifier(random_state=None).fit(xma_train, y_train)
-    baseline_model_rf_cj = RandomForestClassifier(random_state=None).fit(xcj_train, y_train)
-    
-    dump(baseline_model_rf_at, os.path.join(name, "baseline_model_rf_at.joblib"))
-    dump(baseline_model_rf_ke, os.path.join(name, "baseline_model_rf_ke.joblib"))
-    dump(baseline_model_rf_es, os.path.join(name, "baseline_model_rf_es.joblib"))
-    dump(baseline_model_rf_pc, os.path.join(name, "baseline_model_rf_pc.joblib"))
-    dump(baseline_model_rf_ss, os.path.join(name, "baseline_model_rf_ss.joblib"))
-    dump(baseline_model_rf_cd, os.path.join(name, "baseline_model_rf_cd.joblib"))
-    dump(baseline_model_rf_cn, os.path.join(name, "baseline_model_rf_cn.joblib"))
-    dump(baseline_model_rf_kc, os.path.join(name, "baseline_model_rf_kc.joblib"))
-    dump(baseline_model_rf_ce, os.path.join(name, "baseline_model_rf_ce.joblib"))
-    dump(baseline_model_rf_sc, os.path.join(name, "baseline_model_rf_sc.joblib"))
-    dump(baseline_model_rf_ac, os.path.join(name, "baseline_model_rf_ac.joblib"))
-    dump(baseline_model_rf_ma, os.path.join(name, "baseline_model_rf_ma.joblib"))
-    dump(baseline_model_rf_cj, os.path.join(name, "baseline_model_rf_cj.joblib"))
-    
-    yat_pred_rf_train, yat_metric_rf_train = y_prediction(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
-    yes_pred_rf_train, yes_metric_rf_train = y_prediction(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
-    yke_pred_rf_train, yke_metric_rf_train = y_prediction(baseline_model_rf_ke, xke_train, y_train, "yke_pred_rf")
-    ypc_pred_rf_train, ypc_metric_rf_train = y_prediction(baseline_model_rf_pc, xpc_train, y_train, "ypc_pred_rf")
-    yss_pred_rf_train, yss_metric_rf_train = y_prediction(baseline_model_rf_ss, xss_train, y_train, "yss_pred_rf")
-    ycd_pred_rf_train, ycd_metric_rf_train = y_prediction(baseline_model_rf_cd, xcd_train, y_train, "ycd_pred_rf")
-    ycn_pred_rf_train, ycn_metric_rf_train = y_prediction(baseline_model_rf_cn, xcn_train, y_train, "ycn_pred_rf")
-    ykc_pred_rf_train, ykc_metric_rf_train = y_prediction(baseline_model_rf_kc, xkc_train, y_train, "ykc_pred_rf")
-    yce_pred_rf_train, yce_metric_rf_train = y_prediction(baseline_model_rf_ce, xce_train, y_train, "yce_pred_rf")
-    ysc_pred_rf_train, ysc_metric_rf_train = y_prediction(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
-    yac_pred_rf_train, yac_metric_rf_train = y_prediction(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
-    yma_pred_rf_train, yma_metric_rf_train = y_prediction(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
-    ycj_pred_rf_train, ycj_metric_rf_train = y_prediction(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
-    
-    yat_pred_rf_cv,    yat_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
-    yes_pred_rf_cv,    yes_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
-    yke_pred_rf_cv,    yke_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ke, xke_train, y_train, "yke_pred_rf")
-    ypc_pred_rf_cv,    ypc_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_pc, xpc_train, y_train, "ypc_pred_rf")
-    yss_pred_rf_cv,    yss_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ss, xss_train, y_train, "yss_pred_rf")
-    ycd_pred_rf_cv,    ycd_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_cd, xcd_train, y_train, "ycd_pred_rf")
-    ycn_pred_rf_cv,    ycn_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_cn, xcn_train, y_train, "ycn_pred_rf")
-    ykc_pred_rf_cv,    ykc_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_kc, xkc_train, y_train, "ykc_pred_rf")
-    yce_pred_rf_cv,    yce_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ce, xce_train, y_train, "yce_pred_rf")
-    ysc_pred_rf_cv,    ysc_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
-    yac_pred_rf_cv,    yac_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
-    yma_pred_rf_cv,    yma_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
-    ycj_pred_rf_cv,    ycj_metric_rf_cv  =  y_prediction_cv(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
-    
-    plot_auc_auprc_cv(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_ke, xke_train, y_train, "yke_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_pc, xpc_train, y_train, "ypc_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_ss, xss_train, y_train, "yss_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_cd, xcd_train, y_train, "ycd_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_cn, xcn_train, y_train, "ycn_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_kc, xkc_train, y_train, "ykc_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_ce, xce_train, y_train, "yce_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
-    plot_auc_auprc_cv(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
-    
-    yat_pred_rf_loocv,    yat_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_at, xat_train, y_train, "yat_pred_rf")
-    yes_pred_rf_loocv,    yes_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_es, xes_train, y_train, "yes_pred_rf")
-    yke_pred_rf_loocv,    yke_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ke, xke_train, y_train, "yke_pred_rf")
-    ypc_pred_rf_loocv,    ypc_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_pc, xpc_train, y_train, "ypc_pred_rf")
-    yss_pred_rf_loocv,    yss_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ss, xss_train, y_train, "yss_pred_rf")
-    ycd_pred_rf_loocv,    ycd_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_cd, xcd_train, y_train, "ycd_pred_rf")
-    ycn_pred_rf_loocv,    ycn_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_cn, xcn_train, y_train, "ycn_pred_rf")
-    ykc_pred_rf_loocv,    ykc_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_kc, xkc_train, y_train, "ykc_pred_rf")
-    yce_pred_rf_loocv,    yce_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ce, xce_train, y_train, "yce_pred_rf")
-    ysc_pred_rf_loocv,    ysc_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_sc, xsc_train, y_train, "ysc_pred_rf")
-    yac_pred_rf_loocv,    yac_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ac, xac_train, y_train, "yac_pred_rf")
-    yma_pred_rf_loocv,    yma_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_ma, xma_train, y_train, "yma_pred_rf")
-    ycj_pred_rf_loocv,    ycj_metric_rf_loocv  =  y_prediction_loocv(baseline_model_rf_cj, xcj_train, y_train, "ycj_pred_rf")
-
-    #XGB
-    baseline_model_xgb_at = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xat_train, y_train)
-    baseline_model_xgb_ke = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xke_train, y_train)
-    baseline_model_xgb_es = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xes_train, y_train)
-    baseline_model_xgb_pc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xpc_train, y_train)
-    baseline_model_xgb_ss = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xss_train, y_train)
-    baseline_model_xgb_cd = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xcd_train, y_train)
-    baseline_model_xgb_cn = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xcn_train, y_train)
-    baseline_model_xgb_kc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xkc_train, y_train)
-    baseline_model_xgb_ce = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xce_train, y_train)
-    baseline_model_xgb_sc = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xsc_train, y_train)
-    baseline_model_xgb_ac = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xac_train, y_train)
-    baseline_model_xgb_ma = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xma_train, y_train)
-    baseline_model_xgb_cj = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=None).fit(xcj_train, y_train)
-
-
-    dump(baseline_model_xgb_at, os.path.join(name, "baseline_model_xgb_at.joblib"))
-    dump(baseline_model_xgb_ke, os.path.join(name, "baseline_model_xgb_ke.joblib"))
-    dump(baseline_model_xgb_es, os.path.join(name, "baseline_model_xgb_es.joblib"))
-    dump(baseline_model_xgb_pc, os.path.join(name, "baseline_model_xgb_pc.joblib"))
-    dump(baseline_model_xgb_ss, os.path.join(name, "baseline_model_xgb_ss.joblib"))
-    dump(baseline_model_xgb_cd, os.path.join(name, "baseline_model_xgb_cd.joblib"))
-    dump(baseline_model_xgb_cn, os.path.join(name, "baseline_model_xgb_cn.joblib"))
-    dump(baseline_model_xgb_kc, os.path.join(name, "baseline_model_xgb_kc.joblib"))
-    dump(baseline_model_xgb_ce, os.path.join(name, "baseline_model_xgb_ce.joblib"))
-    dump(baseline_model_xgb_sc, os.path.join(name, "baseline_model_xgb_sc.joblib"))
-    dump(baseline_model_xgb_ac, os.path.join(name, "baseline_model_xgb_ac.joblib"))
-    dump(baseline_model_xgb_ma, os.path.join(name, "baseline_model_xgb_ma.joblib"))
-    dump(baseline_model_xgb_cj, os.path.join(name, "baseline_model_xgb_cj.joblib"))
-    
-    yat_pred_xgb_train, yat_metric_xgb_train = y_prediction(   baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
-    yes_pred_xgb_train, yes_metric_xgb_train = y_prediction(   baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
-    yke_pred_xgb_train, yke_metric_xgb_train = y_prediction(   baseline_model_xgb_ke, xke_train, y_train, "yke_pred_xgb")
-    ypc_pred_xgb_train, ypc_metric_xgb_train = y_prediction(   baseline_model_xgb_pc, xpc_train, y_train, "ypc_pred_xgb")
-    yss_pred_xgb_train, yss_metric_xgb_train = y_prediction(   baseline_model_xgb_ss, xss_train, y_train, "yss_pred_xgb")
-    ycd_pred_xgb_train, ycd_metric_xgb_train = y_prediction(   baseline_model_xgb_cd, xcd_train, y_train, "ycd_pred_xgb")
-    ycn_pred_xgb_train, ycn_metric_xgb_train = y_prediction(   baseline_model_xgb_cn, xcn_train, y_train, "ycn_pred_xgb")
-    ykc_pred_xgb_train, ykc_metric_xgb_train = y_prediction(   baseline_model_xgb_kc, xkc_train, y_train, "ykc_pred_xgb")
-    yce_pred_xgb_train, yce_metric_xgb_train = y_prediction(   baseline_model_xgb_ce, xce_train, y_train, "yce_pred_xgb")
-    ysc_pred_xgb_train, ysc_metric_xgb_train = y_prediction(   baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
-    yac_pred_xgb_train, yac_metric_xgb_train = y_prediction(   baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
-    yma_pred_xgb_train, yma_metric_xgb_train = y_prediction(   baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
-    ycj_pred_xgb_train, ycj_metric_xgb_train = y_prediction(   baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
-    
-    plot_auc_auprc_cv(   baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_ke, xke_train, y_train, "yke_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_pc, xpc_train, y_train, "ypc_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_ss, xss_train, y_train, "yss_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_cd, xcd_train, y_train, "ycd_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_cn, xcn_train, y_train, "ycn_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_kc, xkc_train, y_train, "ykc_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_ce, xce_train, y_train, "yce_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
-    plot_auc_auprc_cv(   baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
-    
-    yat_pred_xgb_cv,    yat_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
-    yes_pred_xgb_cv,    yes_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
-    yke_pred_xgb_cv,    yke_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ke, xke_train, y_train, "yke_pred_xgb")
-    ypc_pred_xgb_cv,    ypc_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_pc, xpc_train, y_train, "ypc_pred_xgb")
-    yss_pred_xgb_cv,    yss_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ss, xss_train, y_train, "yss_pred_xgb")
-    ycd_pred_xgb_cv,    ycd_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_cd, xcd_train, y_train, "ycd_pred_xgb")
-    ycn_pred_xgb_cv,    ycn_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_cn, xcn_train, y_train, "ycn_pred_xgb")
-    ykc_pred_xgb_cv,    ykc_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_kc, xkc_train, y_train, "ykc_pred_xgb")
-    yce_pred_xgb_cv,    yce_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ce, xce_train, y_train, "yce_pred_xgb")
-    ysc_pred_xgb_cv,    ysc_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
-    yac_pred_xgb_cv,    yac_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
-    yma_pred_xgb_cv,    yma_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
-    ycj_pred_xgb_cv,    ycj_metric_xgb_cv    = y_prediction_cv(baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
-    
-    yat_pred_xgb_loocv,    yat_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_at, xat_train, y_train, "yat_pred_xgb")
-    yes_pred_xgb_loocv,    yes_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_es, xes_train, y_train, "yes_pred_xgb")
-    yke_pred_xgb_loocv,    yke_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ke, xke_train, y_train, "yke_pred_xgb")
-    ypc_pred_xgb_loocv,    ypc_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_pc, xpc_train, y_train, "ypc_pred_xgb")
-    yss_pred_xgb_loocv,    yss_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ss, xss_train, y_train, "yss_pred_xgb")
-    ycd_pred_xgb_loocv,    ycd_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_cd, xcd_train, y_train, "ycd_pred_xgb")
-    ycn_pred_xgb_loocv,    ycn_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_cn, xcn_train, y_train, "ycn_pred_xgb")
-    ykc_pred_xgb_loocv,    ykc_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_kc, xkc_train, y_train, "ykc_pred_xgb")
-    yce_pred_xgb_loocv,    yce_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ce, xce_train, y_train, "yce_pred_xgb")
-    ysc_pred_xgb_loocv,    ysc_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_sc, xsc_train, y_train, "ysc_pred_xgb")
-    yac_pred_xgb_loocv,    yac_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ac, xac_train, y_train, "yac_pred_xgb")
-    yma_pred_xgb_loocv,    yma_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_ma, xma_train, y_train, "yma_pred_xgb")
-    ycj_pred_xgb_loocv,    ycj_metric_xgb_loocv    = y_prediction_loocv(baseline_model_xgb_cj, xcj_train, y_train, "ycj_pred_xgb")
-
-
-    #SVC
-    baseline_model_svc_at = SVC(random_state=None).fit(xat_train, y_train)
-    baseline_model_svc_ke = SVC(random_state=None).fit(xke_train, y_train)
-    baseline_model_svc_es = SVC(random_state=None).fit(xes_train, y_train)
-    baseline_model_svc_pc = SVC(random_state=None).fit(xpc_train, y_train)
-    baseline_model_svc_ss = SVC(random_state=None).fit(xss_train, y_train)
-    baseline_model_svc_cd = SVC(random_state=None).fit(xcd_train, y_train)
-    baseline_model_svc_cn = SVC(random_state=None).fit(xcn_train, y_train)
-    baseline_model_svc_kc = SVC(random_state=None).fit(xkc_train, y_train)
-    baseline_model_svc_ce = SVC(random_state=None).fit(xce_train, y_train)
-    baseline_model_svc_sc = SVC(random_state=None).fit(xsc_train, y_train)
-    baseline_model_svc_ac = SVC(random_state=None).fit(xac_train, y_train)
-    baseline_model_svc_ma = SVC(random_state=None).fit(xma_train, y_train)
-    baseline_model_svc_cj = SVC(random_state=None).fit(xcj_train, y_train)
-
-
-    dump(baseline_model_svc_at, os.path.join(name, "baseline_model_svc_at.joblib"))
-    dump(baseline_model_svc_ke, os.path.join(name, "baseline_model_svc_ke.joblib"))
-    dump(baseline_model_svc_es, os.path.join(name, "baseline_model_svc_es.joblib"))
-    dump(baseline_model_svc_pc, os.path.join(name, "baseline_model_svc_pc.joblib"))
-    dump(baseline_model_svc_ss, os.path.join(name, "baseline_model_svc_ss.joblib"))
-    dump(baseline_model_svc_cd, os.path.join(name, "baseline_model_svc_cd.joblib"))
-    dump(baseline_model_svc_cn, os.path.join(name, "baseline_model_svc_cn.joblib"))
-    dump(baseline_model_svc_kc, os.path.join(name, "baseline_model_svc_kc.joblib"))
-    dump(baseline_model_svc_ce, os.path.join(name, "baseline_model_svc_ce.joblib"))
-    dump(baseline_model_svc_sc, os.path.join(name, "baseline_model_svc_sc.joblib"))
-    dump(baseline_model_svc_ac, os.path.join(name, "baseline_model_svc_ac.joblib"))
-    dump(baseline_model_svc_ma, os.path.join(name, "baseline_model_svc_ma.joblib"))
-    dump(baseline_model_svc_cj, os.path.join(name, "baseline_model_svc_cj.joblib"))
-    
-    yat_pred_svc_train, yat_metric_svc_train = y_prediction(   baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
-    yes_pred_svc_train, yes_metric_svc_train = y_prediction(   baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
-    yke_pred_svc_train, yke_metric_svc_train = y_prediction(   baseline_model_svc_ke, xke_train, y_train, "yke_pred_svc")
-    ypc_pred_svc_train, ypc_metric_svc_train = y_prediction(   baseline_model_svc_pc, xpc_train, y_train, "ypc_pred_svc")
-    yss_pred_svc_train, yss_metric_svc_train = y_prediction(   baseline_model_svc_ss, xss_train, y_train, "yss_pred_svc")
-    ycd_pred_svc_train, ycd_metric_svc_train = y_prediction(   baseline_model_svc_cd, xcd_train, y_train, "ycd_pred_svc")
-    ycn_pred_svc_train, ycn_metric_svc_train = y_prediction(   baseline_model_svc_cn, xcn_train, y_train, "ycn_pred_svc")
-    ykc_pred_svc_train, ykc_metric_svc_train = y_prediction(   baseline_model_svc_kc, xkc_train, y_train, "ykc_pred_svc")
-    yce_pred_svc_train, yce_metric_svc_train = y_prediction(   baseline_model_svc_ce, xce_train, y_train, "yce_pred_svc")
-    ysc_pred_svc_train, ysc_metric_svc_train = y_prediction(   baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
-    yac_pred_svc_train, yac_metric_svc_train = y_prediction(   baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
-    yma_pred_svc_train, yma_metric_svc_train = y_prediction(   baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
-    ycj_pred_svc_train, ycj_metric_svc_train = y_prediction(   baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
-    
-    plot_auc_auprc_cv(   baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_ke, xke_train, y_train, "yke_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_pc, xpc_train, y_train, "ypc_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_ss, xss_train, y_train, "yss_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_cd, xcd_train, y_train, "ycd_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_cn, xcn_train, y_train, "ycn_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_kc, xkc_train, y_train, "ykc_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_ce, xce_train, y_train, "yce_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
-    plot_auc_auprc_cv(   baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
-    
-    yat_pred_svc_cv,    yat_metric_svc_cv    = y_prediction_cv(baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
-    yes_pred_svc_cv,    yes_metric_svc_cv    = y_prediction_cv(baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
-    yke_pred_svc_cv,    yke_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ke, xke_train, y_train, "yke_pred_svc")
-    ypc_pred_svc_cv,    ypc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_pc, xpc_train, y_train, "ypc_pred_svc")
-    yss_pred_svc_cv,    yss_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ss, xss_train, y_train, "yss_pred_svc")
-    ycd_pred_svc_cv,    ycd_metric_svc_cv    = y_prediction_cv(baseline_model_svc_cd, xcd_train, y_train, "ycd_pred_svc")
-    ycn_pred_svc_cv,    ycn_metric_svc_cv    = y_prediction_cv(baseline_model_svc_cn, xcn_train, y_train, "ycn_pred_svc")
-    ykc_pred_svc_cv,    ykc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_kc, xkc_train, y_train, "ykc_pred_svc")
-    yce_pred_svc_cv,    yce_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ce, xce_train, y_train, "yce_pred_svc")
-    ysc_pred_svc_cv,    ysc_metric_svc_cv    = y_prediction_cv(baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
-    yac_pred_svc_cv,    yac_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
-    yma_pred_svc_cv,    yma_metric_svc_cv    = y_prediction_cv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
-    ycj_pred_svc_cv,    ycj_metric_svc_cv    = y_prediction_cv(baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
-    
-    yat_pred_svc_loocv,    yat_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_at, xat_train, y_train, "yat_pred_svc")
-    yes_pred_svc_loocv,    yes_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_es, xes_train, y_train, "yes_pred_svc")
-    yke_pred_svc_loocv,    yke_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ke, xke_train, y_train, "yke_pred_svc")
-    ypc_pred_svc_loocv,    ypc_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_pc, xpc_train, y_train, "ypc_pred_svc")
-    yss_pred_svc_loocv,    yss_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ss, xss_train, y_train, "yss_pred_svc")
-    ycd_pred_svc_loocv,    ycd_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_cd, xcd_train, y_train, "ycd_pred_svc")
-    ycn_pred_svc_loocv,    ycn_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_cn, xcn_train, y_train, "ycn_pred_svc")
-    ykc_pred_svc_loocv,    ykc_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_kc, xkc_train, y_train, "ykc_pred_svc")
-    yce_pred_svc_loocv,    yce_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ce, xce_train, y_train, "yce_pred_svc")
-    ysc_pred_svc_loocv,    ysc_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_sc, xsc_train, y_train, "ysc_pred_svc")
-    yac_pred_svc_loocv,    yac_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ac, xac_train, y_train, "yac_pred_svc")
-    yma_pred_svc_loocv,    yma_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_ma, xma_train, y_train, "yma_pred_svc")
-    ycj_pred_svc_loocv,    ycj_metric_svc_loocv    = y_prediction_loocv(baseline_model_svc_cj, xcj_train, y_train, "ycj_pred_svc")
-
-    # Shap EState
-    #shap_plot(baseline_model_xgb_es, xes_train, "XGB_EState")
-    print("finished Baseline with SHAP")
-    print("#"*100)
-    print("Stacking")
-    #stack
-    stack_train =pd.concat([yat_pred_rf_train, yat_pred_xgb_train, yat_pred_svc_train,
-                            yes_pred_rf_train, yes_pred_xgb_train, yes_pred_svc_train,
-                            yke_pred_rf_train, yke_pred_xgb_train, yke_pred_svc_train,
-                            ypc_pred_rf_train, ypc_pred_xgb_train, ypc_pred_svc_train,
-                            yss_pred_rf_train, yss_pred_xgb_train, yss_pred_svc_train,
-                            ycd_pred_rf_train, ycd_pred_xgb_train, ycd_pred_svc_train,
-                            ycn_pred_rf_train, ycn_pred_xgb_train, ycn_pred_svc_train,
-                            ykc_pred_rf_train, ykc_pred_xgb_train, ykc_pred_svc_train,
-                            yce_pred_rf_train, yce_pred_xgb_train, yce_pred_svc_train,
-                            ysc_pred_rf_train, ysc_pred_xgb_train, ysc_pred_svc_train,
-                            yac_pred_rf_train, yac_pred_xgb_train, yac_pred_svc_train,
-                            yma_pred_rf_train, yma_pred_xgb_train, yma_pred_svc_train,
-                            ycj_pred_rf_train, ycj_pred_xgb_train, ycj_pred_svc_train],  axis=1)
-    stack_cv    =pd.concat([yat_pred_rf_cv,    yat_pred_xgb_cv,    yat_pred_svc_cv,
-                            yes_pred_rf_cv,    yes_pred_xgb_cv,    yes_pred_svc_cv,
-                            yke_pred_rf_cv,    yke_pred_xgb_cv,    yke_pred_svc_cv,
-                            ypc_pred_rf_cv,    ypc_pred_xgb_cv,    ypc_pred_svc_cv,
-                            yss_pred_rf_cv,    yss_pred_xgb_cv,    yss_pred_svc_cv,
-                            ycd_pred_rf_cv,    ycd_pred_xgb_cv,    ycd_pred_svc_cv,
-                            ycn_pred_rf_cv,    ycn_pred_xgb_cv,    ycn_pred_svc_cv,
-                            ykc_pred_rf_cv,    ykc_pred_xgb_cv,    ykc_pred_svc_cv,
-                            yce_pred_rf_cv,    yce_pred_xgb_cv,    yce_pred_svc_cv,
-                            ysc_pred_rf_cv,    ysc_pred_xgb_cv,    ysc_pred_svc_cv,
-                            yac_pred_rf_cv,    yac_pred_xgb_cv,    yac_pred_svc_cv,
-                            yma_pred_rf_cv,    yma_pred_xgb_cv,    yma_pred_svc_cv,
-                            ycj_pred_rf_cv,    ycj_pred_xgb_cv,    ycj_pred_svc_cv],  axis=1)
-    stack_loocv =pd.concat([yat_pred_rf_loocv,  yat_pred_xgb_loocv,  yat_pred_svc_loocv,
-                            yes_pred_rf_loocv,  yes_pred_xgb_loocv,  yes_pred_svc_loocv,
-                            yke_pred_rf_loocv,  yke_pred_xgb_loocv,  yke_pred_svc_loocv,
-                            ypc_pred_rf_loocv,  ypc_pred_xgb_loocv,  ypc_pred_svc_loocv,
-                            yss_pred_rf_loocv,  yss_pred_xgb_loocv,  yss_pred_svc_loocv,
-                            ycd_pred_rf_loocv,  ycd_pred_xgb_loocv,  ycd_pred_svc_loocv,
-                            ycn_pred_rf_loocv,  ycn_pred_xgb_loocv,  ycn_pred_svc_loocv,
-                            ykc_pred_rf_loocv,  ykc_pred_xgb_loocv,  ykc_pred_svc_loocv,
-                            yce_pred_rf_loocv,  yce_pred_xgb_loocv,  yce_pred_svc_loocv,
-                            ysc_pred_rf_loocv,  ysc_pred_xgb_loocv,  ysc_pred_svc_loocv,
-                            yac_pred_rf_loocv,  yac_pred_xgb_loocv,  yac_pred_svc_loocv,
-                            yma_pred_rf_loocv,  yma_pred_xgb_loocv,  yma_pred_svc_loocv,
-                            ycj_pred_rf_loocv,  ycj_pred_xgb_loocv,  ycj_pred_svc_loocv],  axis=1)
-
-    
-    #save stack original
-    stack_train.to_csv(os.path.join(  name, 'stack', "stacked_train.csv"))
-    stack_cv.to_csv(os.path.join(     name, 'stack', "stacked_cv.csv"))
-    stack_loocv.to_csv(os.path.join(  name, 'stack', "stacked_loocv.csv"))
-    
-    #Train
-    stacked_xgb = xgb.XGBClassifier(objective="binary:logistic",eval_metric='auc', random_state=1)
-    
-    param_grid = {
-    'max_depth': [5]
-    }
-    
-    # Set up GridSearchCV
-    grid_search = GridSearchCV(estimator=stacked_xgb, param_grid=param_grid, scoring='roc_auc', cv=5, verbose=1)
-    grid_search.fit(stack_train, y_train)
-    best_params = grid_search.best_params_
-    
-    print("Best parameters found: ", best_params)
-    print("Best AUC found: ", grid_search.best_score_)
-    
-    stacked_model = xgb.XGBClassifier(**best_params)
-    stacked_model.set_params(objective='binary:logistic', eval_metric='auc', random_state=1)
-    stacked_model.fit(stack_train, y_train)
-    
-    dump(stacked_model, os.path.join(name, 'stack', "stacked_model.joblib"))
-
-    y_pred_stk_train ,  y_metric_stk_train   = y_prediction(   stacked_model, stack_train, y_train, "y_pred_stacked")
-    y_pred_stk_cv    ,  y_metric_stk_cv      = y_prediction(   stacked_model, stack_cv,    y_train, "y_pred_stacked")
-    y_pred_stk_loocv ,  y_metric_stk_loocv   =  y_prediction(   stacked_model, stack_loocv, y_train,  "y_pred_stacked")
-    
-    y_pred_stk_train.to_csv(os.path.join( name, 'stack', "y_pred_train.csv"))
-    y_pred_stk_loocv.to_csv(os.path.join( name, 'stack', "y_pred_test.csv"))
-    y_pred_stk_cv   .to_csv(os.path.join( name, 'stack', "y_pred_cv.csv"))
-    
-    #combine metrics
-    metric_train= pd.concat([yat_metric_rf_train, 
-                            yac_metric_rf_train,   
-                            ycn_metric_rf_train,   
-                            yce_metric_rf_train,   
-                            ycd_metric_rf_train,   
-                            yes_metric_rf_train,   
-                            yke_metric_rf_train,   
-                            ykc_metric_rf_train,   
-                            yma_metric_rf_train,   
-                            ypc_metric_rf_train,   
-                            yss_metric_rf_train,   
-                            ysc_metric_rf_train,
-                            ycj_metric_rf_train,   
-                            yat_metric_svc_train,
-                            yac_metric_svc_train,
-                            ycn_metric_svc_train,
-                            yce_metric_svc_train,
-                            ycd_metric_svc_train,
-                            yes_metric_svc_train,
-                            yke_metric_svc_train,
-                            ykc_metric_svc_train,
-                            yma_metric_svc_train,
-                            ypc_metric_svc_train,
-                            yss_metric_svc_train,
-                            ysc_metric_svc_train,
-                            ycj_metric_svc_train,
-                            yat_metric_xgb_train,
-                            yac_metric_xgb_train,
-                            ycn_metric_xgb_train,
-                            yce_metric_xgb_train,
-                            ycd_metric_xgb_train,
-                            yes_metric_xgb_train,
-                            yke_metric_xgb_train,
-                            ykc_metric_xgb_train,
-                            yma_metric_xgb_train,
-                            ypc_metric_xgb_train,
-                            yss_metric_xgb_train,
-                            ysc_metric_xgb_train,
-                            ycj_metric_xgb_train,
-                            y_metric_stk_train],  axis=0)
-    
-    metric_cv  = pd.concat([yat_metric_rf_cv, 
-                            yac_metric_rf_cv, 
-                            ycn_metric_rf_cv, 
-                            yce_metric_rf_cv, 
-                            ycd_metric_rf_cv, 
-                            yes_metric_rf_cv, 
-                            yke_metric_rf_cv, 
-                            ykc_metric_rf_cv, 
-                            yma_metric_rf_cv, 
-                            ypc_metric_rf_cv, 
-                            yss_metric_rf_cv, 
-                            ysc_metric_rf_cv,
-                            ycj_metric_rf_cv,  
-                            yat_metric_svc_cv,
-                            yac_metric_svc_cv,
-                            ycn_metric_svc_cv,
-                            yce_metric_svc_cv,
-                            ycd_metric_svc_cv,
-                            yes_metric_svc_cv,
-                            yke_metric_svc_cv,
-                            ykc_metric_svc_cv,
-                            yma_metric_svc_cv,
-                            ypc_metric_svc_cv,
-                            yss_metric_svc_cv,
-                            ysc_metric_svc_cv,
-                            ycj_metric_svc_cv,
-                            yat_metric_xgb_cv,  
-                            yac_metric_xgb_cv,  
-                            ycn_metric_xgb_cv,  
-                            yce_metric_xgb_cv,  
-                            ycd_metric_xgb_cv,  
-                            yes_metric_xgb_cv,  
-                            yke_metric_xgb_cv,  
-                            ykc_metric_xgb_cv,  
-                            yma_metric_xgb_cv,  
-                            ypc_metric_xgb_cv,  
-                            yss_metric_xgb_cv,  
-                            ysc_metric_xgb_cv, 
-                            ycj_metric_xgb_cv, 
-                            y_metric_stk_cv],  axis=0)
-    
-    metric_loocv  = pd.concat([yat_metric_rf_loocv, 
-                            yac_metric_rf_loocv, 
-                            ycn_metric_rf_loocv, 
-                            yce_metric_rf_loocv, 
-                            ycd_metric_rf_loocv, 
-                            yes_metric_rf_loocv, 
-                            yke_metric_rf_loocv, 
-                            ykc_metric_rf_loocv, 
-                            yma_metric_rf_loocv, 
-                            ypc_metric_rf_loocv, 
-                            yss_metric_rf_loocv, 
-                            ysc_metric_rf_loocv, 
-                            ycj_metric_rf_loocv, 
-                            yat_metric_svc_loocv,
-                            yac_metric_svc_loocv,
-                            ycn_metric_svc_loocv,
-                            yce_metric_svc_loocv,
-                            ycd_metric_svc_loocv,
-                            yes_metric_svc_loocv,
-                            yke_metric_svc_loocv,
-                            ykc_metric_svc_loocv,
-                            yma_metric_svc_loocv,
-                            ypc_metric_svc_loocv,
-                            yss_metric_svc_loocv,
-                            ysc_metric_svc_loocv,
-                            ycj_metric_svc_loocv,
-                            yat_metric_xgb_loocv,  
-                            yac_metric_xgb_loocv,  
-                            ycn_metric_xgb_loocv,  
-                            yce_metric_xgb_loocv,  
-                            ycd_metric_xgb_loocv,  
-                            yes_metric_xgb_loocv,  
-                            yke_metric_xgb_loocv,  
-                            ykc_metric_xgb_loocv,  
-                            yma_metric_xgb_loocv,  
-                            ypc_metric_xgb_loocv,  
-                            yss_metric_xgb_loocv,  
-                            ysc_metric_xgb_loocv,
-                            ycj_metric_xgb_loocv,  
-                            y_metric_stk_loocv],  axis=0)
-    
-    # round number
-    metric_train = round(metric_train, 3)
-    metric_cv    = round(metric_cv, 3)
-    metric_loocv = round(metric_loocv, 3)
-    
-    metric_train.to_csv(os.path.join( name, "metric_train.csv"))
-    metric_cv   .to_csv(os.path.join( name, "metric_cv.csv"))
-    metric_loocv.to_csv(os.path.join( name, "metric_loocv.csv"))
-    return stacked_model, stack_train, stack_cv, stack_loocv, metric_train, metric_loocv, metric_cv, best_params
-
-
 def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
     from sklearn.neighbors import NearestNeighbors
+    from sklearn.ensemble import StackingClassifier
     nn = NearestNeighbors(n_neighbors=k, algorithm='brute', metric='euclidean').fit(x_train)
     dump(nn, os.path.join(name, "ad_"+ str(k) +"_"+ str(z) +".joblib"))
     distance, index = nn.kneighbors(x_train)
@@ -887,23 +390,160 @@ def shap_plot(stacked_model, stack_test, name):
     plt.close()
     
 def main():
-    for name in ['nafld']:  
-        print("#"*100) 
-        print(name)
-        y_train  = pd.read_csv(os.path.join(name,"y_label.csv"), index_col=0)
-        print("Y_train")
-        print(y_train)
-        stacked_model, stack_train, stack_cv, stack_loocv, metric_train, metric_loocv, metric_cv, best_params = stacked_class(name)
-        print("finish train ", name)
-        #shap_plot(stacked_model, stack_train, "XGB_stacked")
-        #print("finished shap", name)
-        #y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name)
-        #print("finish yrandom ", name)
-        #plot_importance_xgb(stacked_model, name)
-        #print("finish top features ", name)
-        #run_ad(stacked_model, stack_cv, stack_test, y_test, name, z=0.5)
-        #print("finish ad ", name)
-        
+    all_results = []
+    model_types = [
+        ("RF", RandomForestClassifier(max_depth=3, max_features=5, random_state=None)),
+        ("SVM", SVC(probability=True, kernel='rbf', C=1, gamma='scale', random_state=None)),
+        ("XGB", xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None))
+    ]
+    for x in ['AP2DC','AD2D','EState','CDKExt','CDK','CDKGraph','KRFPC','KRFP','MACCS','PubChem','SubFPC','SubFP', 'Combined']:
+        print("#"*100)
+        x_train = pd.read_csv(os.path.join('nafld', x+'.csv'), index_col=0)
+        x_train_red = remove_constant_string_des(x_train)
+        x_train_red = remove_highly_correlated_features(x_train_red, threshold=0.7)
+        y_train = pd.read_csv(os.path.join('nafld', 'y_train.csv'), index_col=0)
+        for model_prefix, model_instance in model_types:
+            model = model_instance.fit(x_train_red, y_train.values.ravel())
+            y_pred_cv, metrics_cv = y_prediction_cv(model, x_train_red, y_train, model_prefix + x)
+            y_pred_loocv, metrics_loocv = y_prediction_loocv(model, x_train_red, y_train, model_prefix + x)
+            plot_auc_auprc_cv(model, x_train_red, y_train, model_prefix + x)
+
+            # Collect metrics for result_cv.csv
+            result_row_cv = {
+                "Feature": x,
+                "Model": model_prefix,
+                "BACC": metrics_cv.loc[model_prefix + x, 'BACC'],
+                "Sensitivity": metrics_cv.loc[model_prefix + x, 'Sensitivity'],
+                "Specificity": metrics_cv.loc[model_prefix + x, 'Specificity'],
+                "MCC": metrics_cv.loc[model_prefix + x, 'MCC'],
+                "AUROC": metrics_cv.loc[model_prefix + x, 'AUROC'],
+                "AUPRC": metrics_cv.loc[model_prefix + x, 'AUPRC'],
+                "F1 Score": metrics_cv.loc[model_prefix + x, 'F1 Score'],
+            }
+            all_results.append(result_row_cv)
+
+            # Save results after each fingerprint/model (append mode)
+            results_cv = pd.DataFrame([result_row_cv])
+            results_file = "results_cv.csv"
+            if os.path.exists(results_file):
+                existing = pd.read_csv(results_file)
+                results_cv = pd.concat([existing, results_cv], ignore_index=True)
+            results_cv.to_csv(results_file, index=False)
+            print(f"✅ Results CV appended for {model_prefix} {x}")
+
+            # Collect metrics for LOOCV
+            result_row_loocv = {
+                "Feature": x,
+                "Model": model_prefix,
+                "BACC": metrics_loocv.loc[model_prefix + x, 'BACC'],
+                "Sensitivity": metrics_loocv.loc[model_prefix + x, 'Sensitivity'],
+                "Specificity": metrics_loocv.loc[model_prefix + x, 'Specificity'],
+                "MCC": metrics_loocv.loc[model_prefix + x, 'MCC'],
+                "AUROC": metrics_loocv.loc[model_prefix + x, 'AUROC'],
+                "AUPRC": metrics_loocv.loc[model_prefix + x, 'AUPRC'],
+                "F1 Score": metrics_loocv.loc[model_prefix + x, 'F1 Score'],
+            }
+            results_loocv = pd.DataFrame([result_row_loocv])
+            results_loocv_file = "results_loocv.csv"
+            if os.path.exists(results_loocv_file):
+                existing_loocv = pd.read_csv(results_loocv_file)
+                results_loocv = pd.concat([existing_loocv, results_loocv], ignore_index=True)
+            results_loocv.to_csv(results_loocv_file, index=False)
+            print(f"✅ Results LOOCV appended for {model_prefix} {x}")
+
+    # Stacked Generalization with OOF predictions
+    # Define fingerprints and base models
+    fingerprints = ['AP2DC','AD2D','EState','CDKExt','CDK','CDKGraph','KRFPC','KRFP','MACCS','PubChem','SubFPC','SubFP' ]
+    base_model_defs = [
+        ("RF", RandomForestClassifier(max_depth=3, max_features=5, random_state=None)),
+        ("SVM", SVC(probability=True, kernel='rbf', C=1, gamma='scale', random_state=None)),
+        ("XGB", xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None))
+    ]
+
+    # Prepare data
+    X_dict = {}
+    for fp in fingerprints:
+        X = pd.read_csv(os.path.join('nafld', f'{fp}.csv'), index_col=0)
+        X = remove_constant_string_des(X)
+        X = remove_highly_correlated_features(X, threshold=0.7)
+        X_dict[fp] = X
+    y = pd.read_csv(os.path.join('nafld', 'y_train.csv'), index_col=0).values.ravel()
+
+    # Generate OOF predictions for each base model
+    from sklearn.model_selection import StratifiedKFold
+
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=None)
+    stacked_features = pd.DataFrame(index=X_dict[fingerprints[0]].index)
+    base_model_names = []
+
+    for fp in fingerprints:
+        X_fp = X_dict[fp]
+        for model_name, model in base_model_defs:
+            col_name = f"{model_name}_{fp}"
+            base_model_names.append(col_name)
+            oof_pred = np.zeros(len(X_fp))
+            for train_idx, val_idx in skf.split(X_fp, y):
+                X_tr, X_val = X_fp.iloc[train_idx], X_fp.iloc[val_idx]
+                y_tr = y[train_idx]
+                m = clone(model)
+                m.fit(X_tr, y_tr)
+                if hasattr(m, "predict_proba"):
+                    oof_pred[val_idx] = m.predict_proba(X_val)[:, 1]
+                else:
+                    oof_pred[val_idx] = m.decision_function(X_val)
+            stacked_features[col_name] = oof_pred
+
+    # Train meta-model (XGBoost) on stacked features
+    meta_model = xgb.XGBClassifier(max_depth=3, use_label_encoder=False, eval_metric='logloss', random_state=None)
+    meta_model.fit(stacked_features, y)
+
+    # Evaluate meta-model
+    y_pred_stack_cv, metrics_stack_cv = y_prediction_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
+    y_pred_stack_loocv, metrics_stack_loocv = y_prediction_loocv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
+    plot_auc_auprc_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
+
+    # Collect metrics for result_cv.csv
+    result_row = {
+        "Feature": "Stacked_All",  # or another appropriate label
+        "Model": "Stacked_XGB",
+        "BACC": metrics_stack_cv.loc["Stacked_XGB", 'BACC'],
+        "Sensitivity": metrics_stack_cv.loc["Stacked_XGB", 'Sensitivity'],
+        "Specificity": metrics_stack_cv.loc["Stacked_XGB", 'Specificity'],
+        "MCC": metrics_stack_cv.loc["Stacked_XGB", 'MCC'],
+        "AUROC": metrics_stack_cv.loc["Stacked_XGB", 'AUROC'],
+        "AUPRC": metrics_stack_cv.loc["Stacked_XGB", 'AUPRC'],
+        "F1 Score": metrics_stack_cv.loc["Stacked_XGB", 'F1 Score'],
+    }
+    # Save to results_cv.csv
+    results_file = "results_cv.csv"
+    results_cv = pd.DataFrame([result_row])
+    if os.path.exists(results_file):
+        existing = pd.read_csv(results_file)
+        results_cv = pd.concat([existing, results_cv], ignore_index=True)
+    results_cv.to_csv(results_file, index=False)
+
+
+    result_row = {
+        "Feature": "Stacked_All",  # or another appropriate label
+        "Model": "Stacked_XGB",
+        "BACC": metrics_stack_loocv.loc["Stacked_XGB", 'BACC'],
+        "Sensitivity": metrics_stack_loocv.loc["Stacked_XGB", 'Sensitivity'],
+        "Specificity": metrics_stack_loocv.loc["Stacked_XGB", 'Specificity'],
+        "MCC": metrics_stack_loocv.loc["Stacked_XGB", 'MCC'],
+        "AUROC": metrics_stack_loocv.loc["Stacked_XGB", 'AUROC'],
+        "AUPRC": metrics_stack_loocv.loc["Stacked_XGB", 'AUPRC'],
+        "F1 Score": metrics_stack_loocv.loc["Stacked_XGB", 'F1 Score'],
+    }
+    # Save to results_loocv.csv
+    results_loocv_file = "results_loocv.csv"
+    results_loocv = pd.DataFrame([result_row])
+    if os.path.exists(results_loocv_file):
+        existing_loocv = pd.read_csv(results_loocv_file)
+        results_loocv = pd.concat([existing_loocv, results_loocv], ignore_index=True)
+    results_loocv.to_csv(results_loocv_file, index=False)
+
+    print("✅ Stacked XGB metrics saved to results_cv.csv and results_loocv.csv")
+
 if __name__ == "__main__":
     main()
 

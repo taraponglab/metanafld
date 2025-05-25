@@ -76,7 +76,7 @@ def main():
         fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma = compute_fps(df, i)
         # Combine all fingerprints into a single DataFrame
         combined_fps = pd.concat([fp_at, fp_es, fp_ke, fp_pc, fp_ss, fp_cd, fp_cn, fp_kc, fp_ce, fp_sc, fp_ac, fp_ma], axis=1)
-        combined_fps.to_csv(os.path.join(i, 'combined_fps.csv'))
+        combined_fps.to_csv(os.path.join(i, 'Combined.csv'))
 if __name__ == "__main__":
     main()
     
