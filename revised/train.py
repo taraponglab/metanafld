@@ -3,7 +3,7 @@ import numpy as np
 import os
 from joblib import dump, load
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score, recall_score, roc_auc_score, balanced_accuracy_score, roc_curve, matthews_corrcoef, precision_score, precision_recall_curve, auc, average_precision_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score, recall_score, roc_auc_score, balanced_accuracy_score, roc_curve, matthews_corrcoef, precision_score, precision_recall_curve, auc, average_precision_score, RocCurveDisplay, PrecisionRecallDisplay
 from sklearn.model_selection import cross_val_predict, StratifiedKFold, KFold, LeaveOneOut
 import xgboost as xgb
 from sklearn.svm import SVC
@@ -64,19 +64,22 @@ def y_prediction(model, x_train, y_train, col_name):
     }, index=[col_name])
     return y_pred, metrics
 
-def y_prediction_cv(model, x_train, y_train, col_name):
+def y_prediction_cv(model, x_train, y_train, col_name, output_dir='graph_metrics'):
+    os.makedirs(output_dir, exist_ok=True)
+    
     y_pred = cross_val_predict(model, x_train, y_train, cv=5)
-    acc = round(accuracy_score(y_train, y_pred),3)
-    sen = round(recall_score(y_train, y_pred),3)
-    mcc = round(matthews_corrcoef(y_train, y_pred),3)
-    f1  = round(f1_score(y_train, y_pred),3)
-    auc = round(roc_auc_score(y_train, y_pred),3)
-    bcc = round(balanced_accuracy_score(y_train, y_pred),3)
-    prc = round(average_precision_score(y_train, y_pred),3)
-    # Calculate specificity
+    
+    acc = round(accuracy_score(y_train, y_pred), 3)
+    sen = round(recall_score(y_train, y_pred), 3)
+    mcc = round(matthews_corrcoef(y_train, y_pred), 3)
+    f1 = round(f1_score(y_train, y_pred), 3)
+    auc = round(roc_auc_score(y_train, y_pred), 3)
+    bcc = round(balanced_accuracy_score(y_train, y_pred), 3)
+    prc = round(average_precision_score(y_train, y_pred), 3)
+    
     tn, fp, fn, tp = confusion_matrix(y_train, y_pred).ravel()
-    spc = round(tn / (tn + fp),3)
-    # Create a DataFrame to store the metrics
+    spc = round(tn / (tn + fp), 3)
+
     metrics = pd.DataFrame({
         'BACC': [bcc],
         'Accuracy': [acc],
@@ -90,9 +93,12 @@ def y_prediction_cv(model, x_train, y_train, col_name):
     return y_pred, metrics
 
 
-def y_prediction_loocv(model, x_train, y_train, col_name):
+def y_prediction_loocv(model, x_train, y_train, col_name, output_dir='graph_metrics'):
+    os.makedirs(output_dir, exist_ok=True)
+
     loo = LeaveOneOut()
     preds = []
+    probs = []
     indices = []
 
     for train_idx, val_idx in loo.split(x_train, y_train):
@@ -100,11 +106,15 @@ def y_prediction_loocv(model, x_train, y_train, col_name):
         y_tr = y_train.iloc[train_idx]
         model.fit(x_tr, y_tr)
         y_val_pred = model.predict(x_val)
+        y_val_proba = model.predict_proba(x_val)[:, 1]
+
         preds.append(y_val_pred[0])
+        probs.append(y_val_proba[0])
         indices.append(x_val.index[0])
 
-    # Collect all predictions into a DataFrame
+    # Collect predictions and probabilities
     y_pred_all = pd.DataFrame(preds, columns=[col_name], index=indices).sort_index()
+    y_prob_all = pd.Series(probs, index=indices).sort_index()
     y_true_all = y_train.loc[y_pred_all.index]
 
     # Compute metrics on all predictions at once
@@ -128,11 +138,12 @@ def y_prediction_loocv(model, x_train, y_train, col_name):
         'AUPRC': [prc],
         'F1 Score': [f1],
     }, index=[col_name])
+
     return y_pred_all, metrics
 
 
 def plot_auc_auprc_cv(model, x_train, y_train, col_name):
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=None)
     tprs = []
     aucs = []
     mean_fpr = np.linspace(0, 1, 100)
@@ -141,7 +152,7 @@ def plot_auc_auprc_cv(model, x_train, y_train, col_name):
     mean_recall = np.linspace(0, 1, 100)
 
     # ROC Curve
-    plt.figure(figsize=(4, 3))
+    plt.figure(figsize=(5, 3))
     for i, (train_idx, val_idx) in enumerate(skf.split(x_train, y_train)):
         x_tr, x_val = x_train.iloc[train_idx], x_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
@@ -212,9 +223,13 @@ def shap_plot(stacked_model, stack_test, name):
     plt.savefig(name+'_shap.pdf', bbox_inches='tight')
     plt.close()
 
-def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
+
+def nearest_neighbor_AD(x_train, name, k, z=3):
     from sklearn.neighbors import NearestNeighbors
-    from sklearn.ensemble import StackingClassifier
+    """
+    Helper function to calculate the nearest neighbors and determine anomaly detection status.
+    No need to call in the main function, as it is called within run_ad.
+    """
     nn = NearestNeighbors(n_neighbors=k, algorithm='brute', metric='euclidean').fit(x_train)
     dump(nn, os.path.join(name, "ad_"+ str(k) +"_"+ str(z) +".joblib"))
     distance, index = nn.kneighbors(x_train)
@@ -225,16 +240,13 @@ def nearest_neighbor_AD(x_train, x_test, name, k, z=3):
     sk = np.std(di)
     print('dk = ', dk)
     print('sk = ', sk)
-    # Calculate di of test
-    distance, index = nn.kneighbors(x_test)
-    di = np.mean(distance, axis=1)
     AD_status = ['within_AD' if di[i] < dk + (z * sk) else 'outside_AD' for i in range(len(di))]
 
     # Create DataFrame with index from x_test and the respective status
-    df = pd.DataFrame(AD_status, index=x_test.index, columns=['AD_status'])
+    df = pd.DataFrame(AD_status, index=x_train.index, columns=['AD_status'])
     return df, dk, sk
 
-def run_ad(stacked_model, stack_train, stack_test, y_train, name, z = 0.5):
+def run_ad(stacked_model, stack_train, y_train, name, z = 0.5):
     # Initialize lists to store metrics for plotting
     k_values = [3, 4, 5, 6, 7, 8, 9, 10]
     MCC_values = []
@@ -244,7 +256,7 @@ def run_ad(stacked_model, stack_train, stack_test, y_train, name, z = 0.5):
     AUC_values = []
     F1_values = []
     BA_values = []
-    Pre_values = []
+    PRC_values = []
     removed_compounds_values = []
     dk_values = []
     sk_values = []
@@ -252,36 +264,34 @@ def run_ad(stacked_model, stack_train, stack_test, y_train, name, z = 0.5):
     # Remove outside AD
     for i in k_values:
         print('k = ', i, 'z=', str(z))
-        t, dk, sk = nearest_neighbor_AD(stack_train, stack_test, name, i, z=z)
+        t, dk, sk = nearest_neighbor_AD(stack_train, name, i, z=z)
         t.to_csv("AD_train_set_"+str(i)+".csv")
         print(t['AD_status'].value_counts())
-        # Remove outside AD
-        x_ad_test = stack_test[t['AD_status'] == 'within_AD']
-        y_ad_test = y_test.loc[x_ad_test.index]
-        y_pred_test = stacked_model.predict(x_ad_test)
-        print(len(x_ad_test),len(y_ad_test), len(y_pred_test) )
+        # Remove outside AD Traiing set
+        x_ad_train = stack_train[t['AD_status'] == 'within_AD']
+        y_ad_train = y_train.loc[x_ad_train.index]
+        y_pred_train = stacked_model.predict(x_ad_train)
+        print("Check len of x_ad_train, y_ad_train, y_pred_ad_train: ", len(x_ad_train), len(y_ad_train), len(y_pred_train))
         # Evaluation
-        print('Test set')
-        accuracy = round(accuracy_score(y_ad_test, y_pred_test), 3)
-        conf_matrix = confusion_matrix(y_ad_test, y_pred_test)
-        F1 = round(f1_score(y_ad_test, y_pred_test, average='weighted'), 3)
+        print('Training set metrics:')
+        conf_matrix = confusion_matrix(y_ad_train, y_pred_train)
+        F1 = round(f1_score(y_ad_train, y_pred_train), 3)
         tn, fp, fn, tp = conf_matrix.ravel()
         sensitivity = tp / (tp + fn)
         specificity = tn / (tn + fp)
-        auc = roc_auc_score(y_ad_test, y_pred_test)
-        mcc = round(matthews_corrcoef(y_ad_test, y_pred_test), 3)
-        balanced_acc = round(balanced_accuracy_score(y_ad_test, y_pred_test), 3)
-        pre_scores = round(precision_score(y_ad_test, y_pred_test), 3)
-        print('ACC: ', accuracy, 'Sen: ', sensitivity, 'Spe: ', specificity, 'MCC: ', mcc,'AUC: ', auc,'BA: ', balanced_acc, 'Pre:', pre_scores, 'F1: ', F1)
+        auroc = roc_auc_score(y_ad_train, y_pred_train)
+        mcc = round(matthews_corrcoef(y_ad_train, y_pred_train), 3)
+        balanced_acc = round(balanced_accuracy_score(y_ad_train, y_pred_train), 3)
+        auprc = round(average_precision_score(y_ad_train, y_pred_train), 3)
+        print('Sen: ', sensitivity, 'Spe: ', specificity, 'MCC: ', mcc,'AUROC: ', auroc,'BACC: ', balanced_acc, 'AUPRC:', auprc, 'F1: ', F1)
         # Store metrics for plotting
         MCC_values.append(mcc)
-        ACC_values.append(accuracy)
         Sen_values.append(sensitivity)
         Spe_values.append(specificity)
-        AUC_values.append(auc)
+        AUC_values.append(auroc)
         F1_values.append(F1)
         BA_values.append(balanced_acc)
-        Pre_values.append(pre_scores)
+        PRC_values.append(auprc)
         removed_compounds_values.append((t['AD_status'] == 'outside_AD').sum())
         dk_values.append(dk)
         sk_values.append(sk)
@@ -293,20 +303,19 @@ def run_ad(stacked_model, stack_train, stack_test, y_train, name, z = 0.5):
     AUC_values = np.array(AUC_values)
     F1_values  = np.array(F1_values)
     BA_values  = np.array(BA_values)
-    Pre_values = np.array(Pre_values)
+    PRC_values = np.array(PRC_values)
     dk_values  = np.array(dk_values)
     sk_values  = np.array(sk_values)
     removed_compounds_values = np.array(removed_compounds_values)
     # Save table
     ad_metrics = pd.DataFrame({
         "k": k_values[:len(MCC_values)],  # Adjust if some values are skipped
-        "Accuracy": ACC_values,
         "Balanced Accuracy": BA_values,
         "Sensitivity": Sen_values,
         "Specificity": Spe_values,
         "MCC": MCC_values,
-        "AUC": AUC_values,
-        "Precision": Pre_values,
+        "AUROC": AUC_values,
+        "AUPRC": PRC_values,
         "F1 Score": F1_values,
         "Removed Compounds": removed_compounds_values,
         "dk_values": dk_values,
@@ -321,8 +330,8 @@ def run_ad(stacked_model, stack_train, stack_test, y_train, name, z = 0.5):
     ax1.plot(k_values, Sen_values, 'gs-', label = "Sensitivity")
     ax1.plot(k_values, Spe_values, 'y*-', label = "Specificity")
     ax1.plot(k_values, MCC_values, 'r^-', label = "MCC")
-    ax1.plot(k_values, AUC_values, 'md-', label = "AUC")
-    ax1.plot(k_values, AUC_values, 'cD-', label = "Precision")
+    ax1.plot(k_values, AUC_values, 'md-', label = "AUROC")
+    ax1.plot(k_values, AUC_values, 'cD-', label = "AUPRC")
     ax1.plot(k_values, F1_values,  'cX-',  label = "F1")
     # Adding labels and title
     ax1.set_xlabel('k',      fontsize=12, fontstyle='italic',weight="bold")
@@ -338,56 +347,38 @@ def run_ad(stacked_model, stack_train, stack_test, y_train, name, z = 0.5):
     plt.savefig("AD_"+name+"_"+ str(z)+ "_Classification_separated.svg", bbox_inches='tight') 
     plt.close
 
-def y_random(stack_train, stack_cv, stack_test, y_train, y_test, metric_train, metric_test, best_params, name):
-    MCC_test=[]
-    MCC_train=[]
-    for i in range(1,101):
-      y_train=y_train.sample(frac=1,replace=False,random_state=0)
-
-      model=xgb.XGBClassifier(**best_params).fit(stack_cv, y_train)
-      y_pred_MCCext=model.predict(stack_test)
-      y_pred_MCCtrain=model.predict(stack_train)
-      MCCext=matthews_corrcoef(y_test, y_pred_MCCext)
-      MCC_test.append(MCCext)
-      MCCtrain=matthews_corrcoef(y_train, y_pred_MCCtrain)
-      MCC_train.append(MCCtrain)
-    size=[50]
-    sizes=[20]
-    x=[metric_train.loc['y_pred_stacked', 'MCC']]
-    y=[metric_test.loc['y_pred_stacked', 'MCC']]
+def y_random(stacked_features, y, metric_cv, metric_loocv, best_params, name):
+    MCC_5cv = []
+    MCC_loocv = []
+    for i in range(1, 101):
+        y_shuffled = pd.Series(y).sample(frac=1, replace=False, random_state=i).values
+        model = xgb.XGBClassifier(**best_params).fit(stacked_features, y_shuffled)
+        y_pred_cv, matrics_pred_cv = y_prediction_cv(model, stacked_features, pd.Series(y_shuffled, index=stacked_features.index), "Y-randomization_XGB_" + str(i))
+        y_pred_loocv, matrics_pred_loocv = y_prediction_loocv(model, stacked_features, pd.Series(y_shuffled, index=stacked_features.index), "Y-randomization_XGB_" + str(i))
+        MCC_5cv.append(matthews_corrcoef(y_shuffled, y_pred_cv))
+        MCC_loocv.append(matthews_corrcoef(y_shuffled, y_pred_loocv))
+    # Convert to DataFrame for easier handling and save the results
+    MCC_5cv = pd.DataFrame(MCC_5cv, columns=['MCC']).set_index(pd.Index([f'Y-randomization_{i}' for i in range(1, 101)]))
+    MCC_loocv = pd.DataFrame(MCC_loocv, columns=['MCC']).set_index(pd.Index([f'Y-randomization_{i}' for i in range(1, 101)]))
+    MCC_5cv.to_csv("MCC_5cv_" + name + ".csv")
+    MCC_loocv.to_csv("MCC_loocv_" + name + ".csv")
+    size = [50]
+    sizes = [20]
+    # Use the correct row name for your stacking metrics
+    x = [metric_cv.loc["Stacked_XGB", 'MCC']]
+    y_ = [metric_loocv.loc["Stacked_XGB", 'MCC']]
     fig, ax = plt.subplots(figsize=(3, 3))
     ax.axvline(0.5, c='black', ls=':')
     ax.axhline(0.5, c='black', ls=':')
-    ax.scatter(x,y,s=size,c=['red'],marker='x', label='Our model')
-    ax.scatter(MCC_train,MCC_test, c='blue',edgecolors='black', alpha=0.7, s=sizes, label='Y-randomization')
-    ax.set_xlabel('$MCC_{Train}$', fontsize=14,  fontstyle='italic', weight='bold')
-    ax.set_ylabel('$MCC_{Test}$', fontsize=14,  fontstyle='italic', weight='bold')
-    ax.legend(loc='lower right',fontsize='small')
-    # Adjust layout
+    ax.scatter(x, y_, s=size, c=['red'], marker='x', label='Our model')
+    ax.scatter(MCC_5cv, MCC_loocv, c='blue', edgecolors='black', alpha=0.7, s=sizes, label='Y-randomization')
+    ax.set_xlabel('$MCC_{5CV}$', fontsize=14, fontstyle='italic', weight='bold')
+    ax.set_ylabel('$MCC_{LooCV}$', fontsize=14, fontstyle='italic', weight='bold')
+    ax.legend(loc='lower right', fontsize='small')
     plt.tight_layout()
-    plt.savefig("Y-randomization-"+name+"-classification.pdf", bbox_inches='tight')
-    # Show the plots
+    plt.savefig("Y-randomization-" + name + "-classification.pdf", bbox_inches='tight')
     plt.close()
 
-def plot_importance_xgb(model, name):
-    importance = model.get_booster().get_score(importance_type='gain')
-    features_df = pd.DataFrame(list(importance.items()), columns=['Feature', 'Importance']).sort_values(by='Importance', ascending=False)
-    print(features_df.head(10))
-    plt.figure(figsize=(4, 4))
-    sns.barplot(x='Importance', y='Feature', data=features_df)
-    plt.xlabel("Importance scores", fontsize=12, fontstyle='italic',weight="bold")
-    plt.ylabel("Features", fontsize=12, fontstyle='italic',weight="bold")
-    plt.tight_layout()
-    plt.savefig('top_features_xgb_'+name+'.pdf', bbox_inches='tight')
-    plt.close()
-    
-def shap_plot(stacked_model, stack_test, name):
-    explainer = shap.Explainer(stacked_model)
-    shap_values = explainer(stack_test)
-    shap.summary_plot(shap_values, stack_test, show=False, plot_type="bar", plot_size=(3, 5))
-    plt.xlabel("mean|SHAP|", fontsize=12, fontstyle='italic',weight="bold")
-    plt.savefig(name+'_shap.pdf', bbox_inches='tight')
-    plt.close()
     
 def main():
     all_results = []
@@ -406,7 +397,7 @@ def main():
             model = model_instance.fit(x_train_red, y_train.values.ravel())
             y_pred_cv, metrics_cv = y_prediction_cv(model, x_train_red, y_train, model_prefix + x)
             y_pred_loocv, metrics_loocv = y_prediction_loocv(model, x_train_red, y_train, model_prefix + x)
-            plot_auc_auprc_cv(model, x_train_red, y_train, model_prefix + x)
+            plot_auc_auprc_cv(model, x_train_red, y_train, model_prefix +"_"+ x)
 
             # Collect metrics for result_cv.csv
             result_row_cv = {
@@ -494,14 +485,24 @@ def main():
             stacked_features[col_name] = oof_pred
 
     # Train meta-model (XGBoost) on stacked features
-    meta_model = xgb.XGBClassifier(max_depth=3, use_label_encoder=False, eval_metric='logloss', random_state=None)
+    meta_model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss', random_state=None)
     meta_model.fit(stacked_features, y)
 
     # Evaluate meta-model
     y_pred_stack_cv, metrics_stack_cv = y_prediction_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
     y_pred_stack_loocv, metrics_stack_loocv = y_prediction_loocv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
     plot_auc_auprc_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
-
+    # Save the meta-model
+    dump(meta_model, "meta_model_stacked_xgb.joblib")
+    
+    # Save the stacked features
+    stacked_features.to_csv("stacked_features.csv")
+    # Save the y_predictions from cross-validation and leave-one-out
+    pd.DataFrame(y_pred_stack_cv).to_csv("y_pred_stack_cv.csv")
+    pd.DataFrame(y_pred_stack_loocv).to_csv("y_pred_stack_loocv.csv")
+    print("✅ Stacked XGB model trained and saved as meta_model_stacked_xgb.joblib")
+    
+    
     # Collect metrics for result_cv.csv
     result_row = {
         "Feature": "Stacked_All",  # or another appropriate label
@@ -544,6 +545,50 @@ def main():
 
     print("✅ Stacked XGB metrics saved to results_cv.csv and results_loocv.csv")
 
+    # Only for tree-based models like XGBoost, LightGBM, RandomForest
+    explainer = shap.TreeExplainer(meta_model)
+    shap_values = explainer.shap_values(stacked_features)
+    
+    # Bar plot: mean absolute SHAP values per feature
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, stacked_features, plot_type="bar", show=False)
+    plt.xlabel("Mean |SHAP value|", fontsize=12, fontstyle='italic', weight='bold')
+    plt.tight_layout()
+    plt.savefig("shap_stacked_features_barplot.pdf", bbox_inches='tight')
+    plt.close()
+    
+    # Beeswarm plot for detailed per-sample impact
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, stacked_features, show=False)
+    plt.tight_layout()
+    plt.savefig("shap_stacked_features_beeswarm.pdf", bbox_inches='tight')
+    plt.close()
+
+    # Plot SHAP of SubFPC-XGB 
+    
+    subfpc_xgb = xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None)
+    subfpc_xgb.fit(X_dict['SubFPC'], y)
+    explainer = shap.TreeExplainer(subfpc_xgb)
+    shap_values = explainer.shap_values(X_dict['SubFPC'])
+
+    # Plot SHAP of SubFP-XGB
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, X_dict['SubFPC'] , show=False)
+    plt.tight_layout()
+    plt.savefig("shap_SubFP_XGB_features_beeswarm.pdf", bbox_inches='tight')
+    plt.close()
+
+    # Y-randomization
+    y_random(
+        stacked_features,
+        y,
+        metrics_stack_cv,
+        metrics_stack_loocv,
+        meta_model.get_params(),
+        "Stacked_XGB"
+    )
+    # AD
+    run_ad(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB", z=0.5)
 if __name__ == "__main__":
     main()
 

@@ -1,0 +1,76 @@
+Name,AD_status
+Dihydrotestosterone,within_AD
+Dexamethasone,within_AD
+Ochratoxin A,within_AD
+Cholic acid,within_AD
+Tunicamycin,within_AD
+Acetaminophen,within_AD
+BPA,within_AD
+Thioacetamide,within_AD
+Tamoxifen,within_AD
+Olanzapine,within_AD
+Palmitoleic acid,within_AD
+Oleic acid,within_AD
+10-nitrooleic acid,within_AD
+LPS,within_AD
+Diethylnitrosamine,outside_AD
+Carbon tetrachloride,within_AD
+TCDD,within_AD
+PCB 126,within_AD
+Aroclor 1260,within_AD
+Tetracycline,outside_AD
+Streptozotocin,within_AD
+Methionine,outside_AD
+MSG,within_AD
+Orotic acid,outside_AD
+PFOS,within_AD
+Sucrose,outside_AD
+Glucose,within_AD
+Fructose,within_AD
+Microcystin-LR,within_AD
+Doxorubicin,outside_AD
+T0901317,outside_AD
+Diosgenin,outside_AD
+Pirfenidone,outside_AD
+Ursodexycholic acid,outside_AD
+Alanyl-glutamine,within_AD
+TMAO,within_AD
+Vitamin D3,within_AD
+Fucoxanthin,outside_AD
+Gypenosides,outside_AD
+Atorvastatin,outside_AD
+Exenatide,outside_AD
+Obeticholic acid,outside_AD
+Sodium Butyrate,outside_AD
+Liraglutide,within_AD
+Aramchol,outside_AD
+Metformin,within_AD
+Rosiglitazone,within_AD
+Caffeine,within_AD
+Rapamycin,within_AD
+Geniposide,outside_AD
+Silibinin,within_AD
+Curcumin,within_AD
+Silymarin,within_AD
+Bavachinin,within_AD
+Pioglitazone,within_AD
+Scoparone,within_AD
+Melatonin,within_AD
+Berberine,within_AD
+Sulforaphane,within_AD
+Elafibranor,within_AD
+Gemigliptin,within_AD
+Taurine,within_AD
+Chlorogenic acid,outside_AD
+Gallic acid,within_AD
+Lipoic acid,within_AD
+Epigallocatechin gallate,within_AD
+Allopurinol,outside_AD
+Quercetin,within_AD
+Naringenin,within_AD
+Dihydromyricetin,within_AD
+Chrysin,within_AD
+Clodronate,outside_AD
+Empagliflozin,outside_AD
+Resveratrol,within_AD
+Citicoline,within_AD
