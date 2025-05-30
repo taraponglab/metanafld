@@ -249,13 +249,7 @@ def nearest_neighbor_AD(x_train, name, k, z=3):
 def run_ad(stacked_model, stack_train, y_train, name, z = 0.5):
     # Initialize lists to store metrics for plotting
     k_values = [3, 4, 5, 6, 7, 8, 9, 10]
-    MCC_values = []
-    ACC_values = []
-    Sen_values = []
-    Spe_values = []
     AUC_values = []
-    F1_values = []
-    BA_values = []
     PRC_values = []
     removed_compounds_values = []
     dk_values = []
@@ -274,78 +268,33 @@ def run_ad(stacked_model, stack_train, y_train, name, z = 0.5):
         print("Check len of x_ad_train, y_ad_train, y_pred_ad_train: ", len(x_ad_train), len(y_ad_train), len(y_pred_train))
         # Evaluation
         print('Training set metrics:')
-        conf_matrix = confusion_matrix(y_ad_train, y_pred_train)
-        F1 = round(f1_score(y_ad_train, y_pred_train), 3)
-        tn, fp, fn, tp = conf_matrix.ravel()
-        sensitivity = tp / (tp + fn)
-        specificity = tn / (tn + fp)
         auroc = roc_auc_score(y_ad_train, y_pred_train)
-        mcc = round(matthews_corrcoef(y_ad_train, y_pred_train), 3)
-        balanced_acc = round(balanced_accuracy_score(y_ad_train, y_pred_train), 3)
         auprc = round(average_precision_score(y_ad_train, y_pred_train), 3)
-        print('Sen: ', sensitivity, 'Spe: ', specificity, 'MCC: ', mcc,'AUROC: ', auroc,'BACC: ', balanced_acc, 'AUPRC:', auprc, 'F1: ', F1)
+        print('AUROC: ', auroc,'AUPRC:', auprc)
         # Store metrics for plotting
-        MCC_values.append(mcc)
-        Sen_values.append(sensitivity)
-        Spe_values.append(specificity)
         AUC_values.append(auroc)
-        F1_values.append(F1)
-        BA_values.append(balanced_acc)
         PRC_values.append(auprc)
         removed_compounds_values.append((t['AD_status'] == 'outside_AD').sum())
         dk_values.append(dk)
         sk_values.append(sk)
     k_values   = np.array(k_values)
-    MCC_values = np.array(MCC_values)
-    ACC_values = np.array(ACC_values)
-    Sen_values = np.array(Sen_values)
-    Spe_values = np.array(Spe_values)
     AUC_values = np.array(AUC_values)
-    F1_values  = np.array(F1_values)
-    BA_values  = np.array(BA_values)
     PRC_values = np.array(PRC_values)
     dk_values  = np.array(dk_values)
     sk_values  = np.array(sk_values)
     removed_compounds_values = np.array(removed_compounds_values)
     # Save table
     ad_metrics = pd.DataFrame({
-        "k": k_values[:len(MCC_values)],  # Adjust if some values are skipped
-        "Balanced Accuracy": BA_values,
-        "Sensitivity": Sen_values,
-        "Specificity": Spe_values,
-        "MCC": MCC_values,
+        "k": k_values[:len(AUC_values)],  # Adjust if some values are skipped
         "AUROC": AUC_values,
         "AUPRC": PRC_values,
-        "F1 Score": F1_values,
         "Removed Compounds": removed_compounds_values,
         "dk_values": dk_values,
         "sk_values": sk_values
     })
     ad_metrics = round(ad_metrics, 3)
     ad_metrics.to_csv("AD_metrics_"+name+"_"+ str(z)+ ".csv")
-    # Plotting
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6, 3))
     
-    ax1.plot(k_values, BA_values,  'bo-',  label = "BACC")
-    ax1.plot(k_values, Sen_values, 'gs-', label = "Sensitivity")
-    ax1.plot(k_values, Spe_values, 'y*-', label = "Specificity")
-    ax1.plot(k_values, MCC_values, 'r^-', label = "MCC")
-    ax1.plot(k_values, AUC_values, 'md-', label = "AUROC")
-    ax1.plot(k_values, AUC_values, 'cD-', label = "AUPRC")
-    ax1.plot(k_values, F1_values,  'cX-',  label = "F1")
-    # Adding labels and title
-    ax1.set_xlabel('k',      fontsize=12, fontstyle='italic',weight="bold")
-    ax1.set_ylabel('Scores', fontsize=12, fontstyle='italic', weight='bold')
-    ax1.set_xticks(k_values)
-    ax1.legend(loc='upper left', fontsize='small', bbox_to_anchor=(1.05, 1.02))
-    # Second plot: Bar plot for removed_compounds_values
-    ax2.bar(k_values, removed_compounds_values, color='green', edgecolor='black', alpha=0.5, width=0.3)
-    ax2.set_xlabel('k', fontsize=12, fontstyle='italic',weight="bold")
-    ax2.set_ylabel('Removed compounds', fontsize=12, fontstyle='italic', weight='bold')
-    ax2.set_xticks(k_values)
-    plt.tight_layout()
-    plt.savefig("AD_"+name+"_"+ str(z)+ "_Classification_separated.svg", bbox_inches='tight') 
-    plt.close
 
 def y_random(stacked_features, y, metric_cv, metric_loocv, best_params, name):
     MCC_5cv = []
@@ -379,71 +328,170 @@ def y_random(stacked_features, y, metric_cv, metric_loocv, best_params, name):
     plt.savefig("Y-randomization-" + name + "-classification.pdf", bbox_inches='tight')
     plt.close()
 
-    
+def run_ad_cv(stacked_model, stack_train, y_train, name, z=3):
+    k_values = list(range(3, 11))
+    results = []
+
+    for k in k_values:
+        print(f"===== AD 5-fold CV for k={k}, z={z} =====")
+        # Save AD status for the full training set for this k
+        ad_status_df, dk, sk = nearest_neighbor_AD(stack_train, name, k, z)
+        ad_status_df.to_csv(f"AD_status_{name}_k{k}_z{z}.csv")
+        # ...rest of your code...
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        fold_metrics = []
+        removed_counts = []
+
+        for fold, (train_idx, test_idx) in enumerate(skf.split(stack_train, y_train)):
+            X_tr, X_te = stack_train.iloc[train_idx], stack_train.iloc[test_idx]
+            y_tr, y_te = y_train.iloc[train_idx], y_train.iloc[test_idx]
+
+            # Fit AD on training set
+            _, dk, sk = nearest_neighbor_AD(X_tr, name, k, z)
+            # Apply AD to test set
+            from sklearn.neighbors import NearestNeighbors
+            nn = NearestNeighbors(n_neighbors=k, algorithm='brute', metric='euclidean').fit(X_tr)
+            test_dist, _ = nn.kneighbors(X_te)
+            di_test = np.mean(test_dist, axis=1)
+            test_ad_status = ['within_AD' if di_test[i] < dk + (z * sk) else 'outside_AD' for i in range(len(di_test))]
+            test_ad_mask = np.array(test_ad_status) == 'within_AD'
+
+            # Only evaluate on within-AD test samples
+            X_te_ad = X_te.iloc[test_ad_mask]
+            y_te_ad = y_te.iloc[test_ad_mask]
+            removed_counts.append((~test_ad_mask).sum())
+
+            if len(X_te_ad) == 0:
+                continue  # skip if no within-AD samples
+
+            y_pred = stacked_model.predict(X_te_ad)
+            balanced_acc = round(balanced_accuracy_score(y_te_ad, y_pred), 3)
+            mcc = round(matthews_corrcoef(y_te_ad, y_pred), 3)
+            auroc = roc_auc_score(y_te_ad, y_pred)
+            auprc = round(average_precision_score(y_te_ad, y_pred), 3)
+            fold_metrics.append([balanced_acc, mcc, auroc, auprc])
+
+        # Aggregate results for this k
+        metrics_array = np.array(fold_metrics)
+        metrics_mean = np.mean(metrics_array, axis=0)
+        metrics_std = np.std(metrics_array, axis=0)
+        results.append({
+            "k": k,
+            "BACC Mean": metrics_mean[0],
+            "BACC Std": metrics_std[0],
+            "MCC Mean": metrics_mean[1],
+            "MCC Std": metrics_std[1],
+            "AUROC Mean": metrics_mean[2],
+            "AUROC Std": metrics_std[2],
+            "AUPRC Mean": metrics_mean[3],
+            "AUPRC Std": metrics_std[3],
+            "Removed Compounds Mean": np.mean(removed_counts),
+            "Removed Compounds Std": np.std(removed_counts),
+        })
+        print(f"k={k}: BACC={metrics_mean[0]:.3f}±{metrics_std[0]:.3f}, "
+              f"MCC={metrics_mean[1]:.3f}±{metrics_std[1]:.3f}, "
+              f"AUROC={metrics_mean[2]:.3f}±{metrics_std[2]:.3f}, "
+              f"AUPRC={metrics_mean[3]:.3f}±{metrics_std[3]:.3f}, "
+              f"Removed={np.mean(removed_counts):.1f}±{np.std(removed_counts):.1f}")
+
+    # Save results
+    ad_cv_metrics = pd.DataFrame(results)
+    ad_cv_metrics.to_csv(f"AD_5CV_metrics_{name}_{z}.csv", index=False)
+    print("Saved AD 5CV metrics table.")
+
+def y_random_auroc_auprc(stacked_features, y, metric_cv, metric_loocv, best_params, name):
+    AUROC_5cv = []
+    AUPRC_5cv = []
+    for i in range(1, 101):
+        y_shuffled = pd.Series(y).sample(frac=1, replace=False, random_state=i).values
+        model = xgb.XGBClassifier(**best_params).fit(stacked_features, y_shuffled)
+        y_pred_cv = cross_val_predict(model, stacked_features, y_shuffled, cv=5, method="predict_proba")[:, 1]
+        auroc = roc_auc_score(y_shuffled, y_pred_cv)
+        auprc = average_precision_score(y_shuffled, y_pred_cv)
+        AUROC_5cv.append(auroc)
+        AUPRC_5cv.append(auprc)
+    # Save results
+    pd.DataFrame({'AUROC': AUROC_5cv, 'AUPRC': AUPRC_5cv}).to_csv(f"Yrandom_AUROC_AUPRC_{name}.csv", index=False)
+    # Plot
+    x = [metric_cv.loc["Stacked_XGB", 'AUROC']]
+    y_ = [metric_cv.loc["Stacked_XGB", 'AUPRC']]
+    fig, ax = plt.subplots(figsize=(3, 3))
+    ax.axvline(0.5, c='black', ls=':')
+    ax.axhline(0.5, c='black', ls=':')
+    ax.scatter(x, y_, s=50, c=['red'], marker='x', label='Our model')
+    ax.scatter(AUROC_5cv, AUPRC_5cv, c='blue', edgecolors='black', alpha=0.7, s=20, label='Y-randomization')
+    ax.set_xlabel('$AUROC_{5CV}$', fontsize=14, fontstyle='italic', weight='bold')
+    ax.set_ylabel('$AUPRC_{5CV}$', fontsize=14, fontstyle='italic', weight='bold')
+    ax.legend(loc='lower right', fontsize='small')
+    plt.tight_layout()
+    plt.savefig("Y-randomization-" + name + "-AUROC-AUPRC.pdf", bbox_inches='tight')
+    plt.close()
+
+
 def main():
-    #all_results = []
-    #model_types = [
-    #    ("RF", RandomForestClassifier(max_depth=3, max_features=5, random_state=None)),
-    #    ("SVM", SVC(probability=True, kernel='rbf', C=1, gamma='scale', random_state=None)),
-    #    ("XGB", xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None))
-    #]
-    #for x in ['AP2DC','AD2D','EState','CDKExt','CDK','CDKGraph','KRFPC','KRFP','MACCS','PubChem','SubFPC','SubFP', 'Combined']:
-    #    print("#"*100)
-    #    x_train = pd.read_csv(os.path.join('nafld', x+'.csv'), index_col=0)
-    #    x_train_red = remove_constant_string_des(x_train)
-    #    x_train_red = remove_highly_correlated_features(x_train_red, threshold=0.7)
-    #    y_train = pd.read_csv(os.path.join('nafld', 'y_train.csv'), index_col=0)
-    #    for model_prefix, model_instance in model_types:
-    #        model = model_instance.fit(x_train_red, y_train.values.ravel())
-    #        y_pred_cv, metrics_cv = y_prediction_cv(model, x_train_red, y_train, model_prefix + x)
-    #        y_pred_loocv, metrics_loocv = y_prediction_loocv(model, x_train_red, y_train, model_prefix + x)
-    #        plot_auc_auprc_cv(model, x_train_red, y_train, model_prefix +"_"+ x)
-#
-    #        # Collect metrics for result_cv.csv
-    #        result_row_cv = {
-    #            "Feature": x,
-    #            "Model": model_prefix,
-    #            "BACC": metrics_cv.loc[model_prefix + x, 'BACC'],
-    #            "Sensitivity": metrics_cv.loc[model_prefix + x, 'Sensitivity'],
-    #            "Specificity": metrics_cv.loc[model_prefix + x, 'Specificity'],
-    #            "MCC": metrics_cv.loc[model_prefix + x, 'MCC'],
-    #            "AUROC": metrics_cv.loc[model_prefix + x, 'AUROC'],
-    #            "AUPRC": metrics_cv.loc[model_prefix + x, 'AUPRC'],
-    #            "F1 Score": metrics_cv.loc[model_prefix + x, 'F1 Score'],
-    #        }
-    #        all_results.append(result_row_cv)
-#
-    #        # Save results after each fingerprint/model (append mode)
-    #        results_cv = pd.DataFrame([result_row_cv])
-    #        results_file = "results_cv.csv"
-    #        if os.path.exists(results_file):
-    #            existing = pd.read_csv(results_file)
-    #            results_cv = pd.concat([existing, results_cv], ignore_index=True)
-    #        results_cv.to_csv(results_file, index=False)
-    #        print(f"✅ Results CV appended for {model_prefix} {x}")
-#
-    #        # Collect metrics for LOOCV
-    #        result_row_loocv = {
-    #            "Feature": x,
-    #            "Model": model_prefix,
-    #            "BACC": metrics_loocv.loc[model_prefix + x, 'BACC'],
-    #            "Sensitivity": metrics_loocv.loc[model_prefix + x, 'Sensitivity'],
-    #            "Specificity": metrics_loocv.loc[model_prefix + x, 'Specificity'],
-    #            "MCC": metrics_loocv.loc[model_prefix + x, 'MCC'],
-    #            "AUROC": metrics_loocv.loc[model_prefix + x, 'AUROC'],
-    #            "AUPRC": metrics_loocv.loc[model_prefix + x, 'AUPRC'],
-    #            "F1 Score": metrics_loocv.loc[model_prefix + x, 'F1 Score'],
-    #        }
-    #        results_loocv = pd.DataFrame([result_row_loocv])
-    #        results_loocv_file = "results_loocv.csv"
-    #        if os.path.exists(results_loocv_file):
-    #            existing_loocv = pd.read_csv(results_loocv_file)
-    #            results_loocv = pd.concat([existing_loocv, results_loocv], ignore_index=True)
-    #        results_loocv.to_csv(results_loocv_file, index=False)
-    #        print(f"✅ Results LOOCV appended for {model_prefix} {x}")
-#
-    ## Stacked Generalization with OOF predictions
-    ## Define fingerprints and base models
+    all_results = []
+    model_types = [
+        ("RF", RandomForestClassifier(max_depth=3, max_features=5, random_state=None)),
+        ("SVM", SVC(probability=True, kernel='rbf', C=1, gamma='scale', random_state=None)),
+        ("XGB", xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None))
+    ]
+    for x in ['AP2DC','AD2D','EState','CDKExt','CDK','CDKGraph','KRFPC','KRFP','MACCS','PubChem','SubFPC','SubFP', 'Combined']:
+        print("#"*100)
+        x_train = pd.read_csv(os.path.join('nafld', x+'.csv'), index_col=0)
+        x_train_red = remove_constant_string_des(x_train)
+        x_train_red = remove_highly_correlated_features(x_train_red, threshold=0.7)
+        y_train = pd.read_csv(os.path.join('nafld', 'y_train.csv'), index_col=0)
+        for model_prefix, model_instance in model_types:
+            model = model_instance.fit(x_train_red, y_train.values.ravel())
+            y_pred_cv, metrics_cv = y_prediction_cv(model, x_train_red, y_train, model_prefix + x)
+            y_pred_loocv, metrics_loocv = y_prediction_loocv(model, x_train_red, y_train, model_prefix + x)
+            plot_auc_auprc_cv(model, x_train_red, y_train, model_prefix +"_"+ x)
+
+            # Collect metrics for result_cv.csv
+            result_row_cv = {
+                "Feature": x,
+                "Model": model_prefix,
+                "BACC": metrics_cv.loc[model_prefix + x, 'BACC'],
+                "Sensitivity": metrics_cv.loc[model_prefix + x, 'Sensitivity'],
+                "Specificity": metrics_cv.loc[model_prefix + x, 'Specificity'],
+                "MCC": metrics_cv.loc[model_prefix + x, 'MCC'],
+                "AUROC": metrics_cv.loc[model_prefix + x, 'AUROC'],
+                "AUPRC": metrics_cv.loc[model_prefix + x, 'AUPRC'],
+                "F1 Score": metrics_cv.loc[model_prefix + x, 'F1 Score'],
+            }
+            all_results.append(result_row_cv)
+
+            # Save results after each fingerprint/model (append mode)
+            results_cv = pd.DataFrame([result_row_cv])
+            results_file = "results_cv.csv"
+            if os.path.exists(results_file):
+                existing = pd.read_csv(results_file)
+                results_cv = pd.concat([existing, results_cv], ignore_index=True)
+            results_cv.to_csv(results_file, index=False)
+            print(f"✅ Results CV appended for {model_prefix} {x}")
+
+            # Collect metrics for LOOCV
+            result_row_loocv = {
+                "Feature": x,
+                "Model": model_prefix,
+                "BACC": metrics_loocv.loc[model_prefix + x, 'BACC'],
+                "Sensitivity": metrics_loocv.loc[model_prefix + x, 'Sensitivity'],
+                "Specificity": metrics_loocv.loc[model_prefix + x, 'Specificity'],
+                "MCC": metrics_loocv.loc[model_prefix + x, 'MCC'],
+                "AUROC": metrics_loocv.loc[model_prefix + x, 'AUROC'],
+                "AUPRC": metrics_loocv.loc[model_prefix + x, 'AUPRC'],
+                "F1 Score": metrics_loocv.loc[model_prefix + x, 'F1 Score'],
+            }
+            results_loocv = pd.DataFrame([result_row_loocv])
+            results_loocv_file = "results_loocv.csv"
+            if os.path.exists(results_loocv_file):
+                existing_loocv = pd.read_csv(results_loocv_file)
+                results_loocv = pd.concat([existing_loocv, results_loocv], ignore_index=True)
+            results_loocv.to_csv(results_loocv_file, index=False)
+            print(f"✅ Results LOOCV appended for {model_prefix} {x}")
+
+    # Stacked Generalization with OOF predictions
+    # Define fingerprints and base models
     fingerprints = ['AP2DC','AD2D','EState','CDKExt','CDK','CDKGraph','KRFPC','KRFP','MACCS','PubChem','SubFPC','SubFP', 'Combined']
     base_model_defs = [
         ("RF", RandomForestClassifier(max_depth=3, max_features=5, random_state=None)),
@@ -460,141 +508,141 @@ def main():
         # save the processed fingerprint data
         X.to_csv(os.path.join('nafld', f'{fp}_reduced.csv'))
         X_dict[fp] = X
-    #y = pd.read_csv(os.path.join('nafld', 'y_train.csv'), index_col=0).values.ravel()
-#
-    ## Generate OOF predictions for each base model
-    #from sklearn.model_selection import StratifiedKFold
-#
-    #skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=None)
-    #stacked_features = pd.DataFrame(index=X_dict[fingerprints[0]].index)
-    #base_model_names = []
-#
-    #for fp in fingerprints:
-    #    X_fp = X_dict[fp]
-    #    for model_name, model in base_model_defs:
-    #        col_name = f"{model_name}_{fp}"
-    #        base_model_names.append(col_name)
-    #        oof_pred = np.zeros(len(X_fp))
-    #        for train_idx, val_idx in skf.split(X_fp, y):
-    #            X_tr, X_val = X_fp.iloc[train_idx], X_fp.iloc[val_idx]
-    #            y_tr = y[train_idx]
-    #            m = clone(model)
-    #            m.fit(X_tr, y_tr)
-    #            if hasattr(m, "predict_proba"):
-    #                oof_pred[val_idx] = m.predict_proba(X_val)[:, 1]
-    #            else:
-    #                oof_pred[val_idx] = m.decision_function(X_val)
-    #        stacked_features[col_name] = oof_pred
-#
-    ## Train meta-model (XGBoost) on stacked features
-    #meta_model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss', random_state=None)
-    #meta_model.fit(stacked_features, y)
-#
-    ## Evaluate meta-model
-    #y_pred_stack_cv, metrics_stack_cv = y_prediction_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
-    #y_pred_stack_loocv, metrics_stack_loocv = y_prediction_loocv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
-    #plot_auc_auprc_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
-    ## Save the meta-model
-    #dump(meta_model, "meta_model_stacked_xgb.joblib")
-    #
-    ## Save the stacked features
-    #stacked_features.to_csv("stacked_features.csv")
-    ## Save the y_predictions from cross-validation and leave-one-out
-    #pd.DataFrame(y_pred_stack_cv).to_csv("y_pred_stack_cv.csv")
-    #pd.DataFrame(y_pred_stack_loocv).to_csv("y_pred_stack_loocv.csv")
-    #print("✅ Stacked XGB model trained and saved as meta_model_stacked_xgb.joblib")
-    #
-    #
-    ## Collect metrics for result_cv.csv
-    #result_row = {
-    #    "Feature": "Stacked_All",  # or another appropriate label
-    #    "Model": "Stacked_XGB",
-    #    "BACC": metrics_stack_cv.loc["Stacked_XGB", 'BACC'],
-    #    "Sensitivity": metrics_stack_cv.loc["Stacked_XGB", 'Sensitivity'],
-    #    "Specificity": metrics_stack_cv.loc["Stacked_XGB", 'Specificity'],
-    #    "MCC": metrics_stack_cv.loc["Stacked_XGB", 'MCC'],
-    #    "AUROC": metrics_stack_cv.loc["Stacked_XGB", 'AUROC'],
-    #    "AUPRC": metrics_stack_cv.loc["Stacked_XGB", 'AUPRC'],
-    #    "F1 Score": metrics_stack_cv.loc["Stacked_XGB", 'F1 Score'],
-    #}
-    ## Save to results_cv.csv
-    #results_file = "results_cv.csv"
-    #results_cv = pd.DataFrame([result_row])
-    #if os.path.exists(results_file):
-    #    existing = pd.read_csv(results_file)
-    #    results_cv = pd.concat([existing, results_cv], ignore_index=True)
-    #results_cv.to_csv(results_file, index=False)
-#
-#
-    #result_row = {
-    #    "Feature": "Stacked_All",  # or another appropriate label
-    #    "Model": "Stacked_XGB",
-    #    "BACC": metrics_stack_loocv.loc["Stacked_XGB", 'BACC'],
-    #    "Sensitivity": metrics_stack_loocv.loc["Stacked_XGB", 'Sensitivity'],
-    #    "Specificity": metrics_stack_loocv.loc["Stacked_XGB", 'Specificity'],
-    #    "MCC": metrics_stack_loocv.loc["Stacked_XGB", 'MCC'],
-    #    "AUROC": metrics_stack_loocv.loc["Stacked_XGB", 'AUROC'],
-    #    "AUPRC": metrics_stack_loocv.loc["Stacked_XGB", 'AUPRC'],
-    #    "F1 Score": metrics_stack_loocv.loc["Stacked_XGB", 'F1 Score'],
-    #}
-    ## Save to results_loocv.csv
-    #results_loocv_file = "results_loocv.csv"
-    #results_loocv = pd.DataFrame([result_row])
-    #if os.path.exists(results_loocv_file):
-    #    existing_loocv = pd.read_csv(results_loocv_file)
-    #    results_loocv = pd.concat([existing_loocv, results_loocv], ignore_index=True)
-    #results_loocv.to_csv(results_loocv_file, index=False)
-#
-    #print("✅ Stacked XGB metrics saved to results_cv.csv and results_loocv.csv")
-#
-    ## Only for tree-based models like XGBoost, LightGBM, RandomForest
-    #explainer = shap.TreeExplainer(meta_model)
-    #shap_values = explainer.shap_values(stacked_features)
-    #
-    ## Bar plot: mean absolute SHAP values per feature
-    #plt.figure(figsize=(6, 6))
-    #shap.summary_plot(shap_values, stacked_features, plot_type="bar", show=False)
-    #plt.xlabel("Mean |SHAP value|", fontsize=12, fontstyle='italic', weight='bold')
-    #plt.tight_layout()
-    #plt.savefig("shap_stacked_features_barplot.pdf", bbox_inches='tight')
-    #plt.close()
-    #
-    ## Beeswarm plot for detailed per-sample impact
-    #plt.figure(figsize=(6, 6))
-    #shap.summary_plot(shap_values, stacked_features, show=False)
-    #plt.tight_layout()
-    #plt.savefig("shap_stacked_features_beeswarm.pdf", bbox_inches='tight')
-    #plt.close()
-#
-    ## Plot SHAP of SubFPC-XGB 
-    #
-    #subfpc_xgb = xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None)
-    #subfpc_xgb.fit(X_dict['SubFPC'], y)
-    #explainer = shap.TreeExplainer(subfpc_xgb)
-    #shap_values = explainer.shap_values(X_dict['SubFPC'])
-#
-    ## Plot SHAP of SubFP-XGB
-    #plt.figure(figsize=(6, 6))
-    #shap.summary_plot(shap_values, X_dict['SubFPC'] , show=False)
-    #plt.tight_layout()
-    #plt.savefig("shap_SubFPC_XGB_features_beeswarm.pdf", bbox_inches='tight')
-    #plt.close()
-    #
-    ## Plot SHAP of SubFP-XGB 
-    #
-    #subfpc_xgb = xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None)
-    #subfpc_xgb.fit(X_dict['SubFP'], y)
-    #explainer = shap.TreeExplainer(subfpc_xgb)
-    #shap_values = explainer.shap_values(X_dict['SubFP'])
-#
-    ## Plot SHAP of SubFP-XGB
-    #plt.figure(figsize=(6, 6))
-    #shap.summary_plot(shap_values, X_dict['SubFP'] , show=False)
-    #plt.tight_layout()
-    #plt.savefig("shap_SubFP_XGB_features_beeswarm.pdf", bbox_inches='tight')
-    #plt.close()
-#
-    ## Y-randomization
+    y = pd.read_csv(os.path.join('nafld', 'y_train.csv'), index_col=0).values.ravel()
+
+    # Generate OOF predictions for each base model
+    from sklearn.model_selection import StratifiedKFold
+
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=None)
+    stacked_features = pd.DataFrame(index=X_dict[fingerprints[0]].index)
+    base_model_names = []
+
+    for fp in fingerprints:
+        X_fp = X_dict[fp]
+        for model_name, model in base_model_defs:
+            col_name = f"{model_name}_{fp}"
+            base_model_names.append(col_name)
+            oof_pred = np.zeros(len(X_fp))
+            for train_idx, val_idx in skf.split(X_fp, y):
+                X_tr, X_val = X_fp.iloc[train_idx], X_fp.iloc[val_idx]
+                y_tr = y[train_idx]
+                m = clone(model)
+                m.fit(X_tr, y_tr)
+                if hasattr(m, "predict_proba"):
+                    oof_pred[val_idx] = m.predict_proba(X_val)[:, 1]
+                else:
+                    oof_pred[val_idx] = m.decision_function(X_val)
+            stacked_features[col_name] = oof_pred
+
+    # Train meta-model (XGBoost) on stacked features
+    meta_model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss', random_state=None)
+    meta_model.fit(stacked_features, y)
+
+    # Evaluate meta-model
+    y_pred_stack_cv, metrics_stack_cv = y_prediction_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
+    y_pred_stack_loocv, metrics_stack_loocv = y_prediction_loocv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
+    plot_auc_auprc_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB")
+    # Save the meta-model
+    dump(meta_model, "meta_model_stacked_xgb.joblib")
+    
+    # Save the stacked features
+    stacked_features.to_csv("stacked_features.csv")
+    # Save the y_predictions from cross-validation and leave-one-out
+    pd.DataFrame(y_pred_stack_cv).to_csv("y_pred_stack_cv.csv")
+    pd.DataFrame(y_pred_stack_loocv).to_csv("y_pred_stack_loocv.csv")
+    print("✅ Stacked XGB model trained and saved as meta_model_stacked_xgb.joblib")
+    
+    
+    # Collect metrics for result_cv.csv
+    result_row = {
+        "Feature": "Stacked_All",  # or another appropriate label
+        "Model": "Stacked_XGB",
+        "BACC": metrics_stack_cv.loc["Stacked_XGB", 'BACC'],
+        "Sensitivity": metrics_stack_cv.loc["Stacked_XGB", 'Sensitivity'],
+        "Specificity": metrics_stack_cv.loc["Stacked_XGB", 'Specificity'],
+        "MCC": metrics_stack_cv.loc["Stacked_XGB", 'MCC'],
+        "AUROC": metrics_stack_cv.loc["Stacked_XGB", 'AUROC'],
+        "AUPRC": metrics_stack_cv.loc["Stacked_XGB", 'AUPRC'],
+        "F1 Score": metrics_stack_cv.loc["Stacked_XGB", 'F1 Score'],
+    }
+    # Save to results_cv.csv
+    results_file = "results_cv.csv"
+    results_cv = pd.DataFrame([result_row])
+    if os.path.exists(results_file):
+        existing = pd.read_csv(results_file)
+        results_cv = pd.concat([existing, results_cv], ignore_index=True)
+    results_cv.to_csv(results_file, index=False)
+
+
+    result_row = {
+        "Feature": "Stacked_All",  # or another appropriate label
+        "Model": "Stacked_XGB",
+        "BACC": metrics_stack_loocv.loc["Stacked_XGB", 'BACC'],
+        "Sensitivity": metrics_stack_loocv.loc["Stacked_XGB", 'Sensitivity'],
+        "Specificity": metrics_stack_loocv.loc["Stacked_XGB", 'Specificity'],
+        "MCC": metrics_stack_loocv.loc["Stacked_XGB", 'MCC'],
+        "AUROC": metrics_stack_loocv.loc["Stacked_XGB", 'AUROC'],
+        "AUPRC": metrics_stack_loocv.loc["Stacked_XGB", 'AUPRC'],
+        "F1 Score": metrics_stack_loocv.loc["Stacked_XGB", 'F1 Score'],
+    }
+    # Save to results_loocv.csv
+    results_loocv_file = "results_loocv.csv"
+    results_loocv = pd.DataFrame([result_row])
+    if os.path.exists(results_loocv_file):
+        existing_loocv = pd.read_csv(results_loocv_file)
+        results_loocv = pd.concat([existing_loocv, results_loocv], ignore_index=True)
+    results_loocv.to_csv(results_loocv_file, index=False)
+
+    print("✅ Stacked XGB metrics saved to results_cv.csv and results_loocv.csv")
+
+    # Only for tree-based models like XGBoost, LightGBM, RandomForest
+    explainer = shap.TreeExplainer(meta_model)
+    shap_values = explainer.shap_values(stacked_features)
+    
+    # Bar plot: mean absolute SHAP values per feature
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, stacked_features, plot_type="bar", show=False)
+    plt.xlabel("Mean |SHAP value|", fontsize=12, fontstyle='italic', weight='bold')
+    plt.tight_layout()
+    plt.savefig("shap_stacked_features_barplot.pdf", bbox_inches='tight')
+    plt.close()
+    
+    # Beeswarm plot for detailed per-sample impact
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, stacked_features, show=False)
+    plt.tight_layout()
+    plt.savefig("shap_stacked_features_beeswarm.pdf", bbox_inches='tight')
+    plt.close()
+
+    # Plot SHAP of SubFPC-XGB 
+    
+    subfpc_xgb = xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None)
+    subfpc_xgb.fit(X_dict['SubFPC'], y)
+    explainer = shap.TreeExplainer(subfpc_xgb)
+    shap_values = explainer.shap_values(X_dict['SubFPC'])
+
+    # Plot SHAP of SubFP-XGB
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, X_dict['SubFPC'] , show=False)
+    plt.tight_layout()
+    plt.savefig("shap_SubFPC_XGB_features_beeswarm.pdf", bbox_inches='tight')
+    plt.close()
+    
+    # Plot SHAP of SubFP-XGB 
+    
+    subfpc_xgb = xgb.XGBClassifier(max_depth=3, eval_metric='logloss', random_state=None)
+    subfpc_xgb.fit(X_dict['SubFP'], y)
+    explainer = shap.TreeExplainer(subfpc_xgb)
+    shap_values = explainer.shap_values(X_dict['SubFP'])
+
+    # Plot SHAP of SubFP-XGB
+    plt.figure(figsize=(6, 6))
+    shap.summary_plot(shap_values, X_dict['SubFP'] , show=False)
+    plt.tight_layout()
+    plt.savefig("shap_SubFP_XGB_features_beeswarm.pdf", bbox_inches='tight')
+    plt.close()
+
+    # Y-randomization
     #y_random(
     #    stacked_features,
     #    y,
@@ -603,8 +651,18 @@ def main():
     #    meta_model.get_params(),
     #    "Stacked_XGB"
     #)
-    ## AD
+
+    y_random_auroc_auprc(
+        stacked_features,
+        y,
+        metrics_stack_cv,
+        metrics_stack_loocv,
+        meta_model.get_params(),
+        "Stacked_XGB"
+    )
+    # AD
     #run_ad(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB", z=0.5)
+    run_ad_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB", z=3)
 if __name__ == "__main__":
     main()
 

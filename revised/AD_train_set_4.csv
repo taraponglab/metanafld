@@ -5,50 +5,50 @@ Ochratoxin A,within_AD
 Cholic acid,within_AD
 Tunicamycin,within_AD
 Acetaminophen,within_AD
-BPA,outside_AD
-Thioacetamide,outside_AD
+BPA,within_AD
+Thioacetamide,within_AD
 Tamoxifen,within_AD
-Olanzapine,outside_AD
+Olanzapine,within_AD
 Palmitoleic acid,within_AD
 Oleic acid,within_AD
 10-nitrooleic acid,within_AD
-LPS,within_AD
+LPS,outside_AD
 Diethylnitrosamine,outside_AD
-Carbon tetrachloride,outside_AD
-TCDD,within_AD
-PCB 126,within_AD
+Carbon tetrachloride,within_AD
+TCDD,outside_AD
+PCB 126,outside_AD
 Aroclor 1260,within_AD
-Tetracycline,within_AD
+Tetracycline,outside_AD
 Streptozotocin,within_AD
-Methionine,within_AD
+Methionine,outside_AD
 MSG,outside_AD
 Orotic acid,within_AD
 PFOS,outside_AD
-Sucrose,outside_AD
+Sucrose,within_AD
 Glucose,within_AD
 Fructose,within_AD
 Microcystin-LR,within_AD
 Doxorubicin,within_AD
 T0901317,outside_AD
 Diosgenin,within_AD
-Pirfenidone,within_AD
+Pirfenidone,outside_AD
 Ursodexycholic acid,outside_AD
 Alanyl-glutamine,outside_AD
 TMAO,within_AD
 Vitamin D3,outside_AD
 Fucoxanthin,within_AD
-Gypenosides,within_AD
-Atorvastatin,outside_AD
+Gypenosides,outside_AD
+Atorvastatin,within_AD
 Exenatide,within_AD
-Obeticholic acid,within_AD
-Sodium Butyrate,outside_AD
+Obeticholic acid,outside_AD
+Sodium Butyrate,within_AD
 Liraglutide,within_AD
-Aramchol,within_AD
+Aramchol,outside_AD
 Metformin,within_AD
-Rosiglitazone,outside_AD
+Rosiglitazone,within_AD
 Caffeine,within_AD
 Rapamycin,outside_AD
-Geniposide,within_AD
+Geniposide,outside_AD
 Silibinin,within_AD
 Curcumin,within_AD
 Silymarin,within_AD
@@ -59,18 +59,18 @@ Melatonin,within_AD
 Berberine,within_AD
 Sulforaphane,outside_AD
 Elafibranor,within_AD
-Gemigliptin,within_AD
-Taurine,outside_AD
+Gemigliptin,outside_AD
+Taurine,within_AD
 Chlorogenic acid,within_AD
-Gallic acid,within_AD
-Lipoic acid,outside_AD
+Gallic acid,outside_AD
+Lipoic acid,within_AD
 Epigallocatechin gallate,within_AD
-Allopurinol,within_AD
+Allopurinol,outside_AD
 Quercetin,within_AD
 Naringenin,within_AD
 Dihydromyricetin,within_AD
 Chrysin,within_AD
 Clodronate,within_AD
 Empagliflozin,outside_AD
-Resveratrol,within_AD
+Resveratrol,outside_AD
 Citicoline,outside_AD
