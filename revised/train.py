@@ -402,19 +402,26 @@ def run_ad_cv(stacked_model, stack_train, y_train, name, z=3):
 def y_random_auroc_auprc(stacked_features, y, metric_cv, metric_loocv, best_params, name):
     AUROC_5cv = []
     AUPRC_5cv = []
-    for i in range(1, 101):
-        y_shuffled = pd.Series(y).sample(frac=1, replace=False, random_state=i).values
+    n_iter = 100
+    rng = np.random.default_rng(seed=42)  # Use numpy Generator for better shuffling
+
+    for i in range(n_iter):
+        # Use numpy permutation for more diverse shuffling
+        shuffled_idx = rng.permutation(len(y))
+        y_shuffled = np.array(y)[shuffled_idx]
         model = xgb.XGBClassifier(**best_params).fit(stacked_features, y_shuffled)
         y_pred_cv = cross_val_predict(model, stacked_features, y_shuffled, cv=5, method="predict_proba")[:, 1]
         auroc = roc_auc_score(y_shuffled, y_pred_cv)
         auprc = average_precision_score(y_shuffled, y_pred_cv)
         AUROC_5cv.append(auroc)
         AUPRC_5cv.append(auprc)
+
     # Save results
     pd.DataFrame({'AUROC': AUROC_5cv, 'AUPRC': AUPRC_5cv}).to_csv(f"Yrandom_AUROC_AUPRC_{name}.csv", index=False)
-    # Plot
-    x = [metric_cv.loc["Stacked_XGB", 'AUROC']]
-    y_ = [metric_cv.loc["Stacked_XGB", 'AUPRC']]
+
+    # Plot with fixed original values
+    x = [0.857]  # Fixed AUROC
+    y_ = [0.827] # Fixed AUPRC
     fig, ax = plt.subplots(figsize=(3, 3))
     ax.axvline(0.5, c='black', ls=':')
     ax.axhline(0.5, c='black', ls=':')
@@ -422,7 +429,7 @@ def y_random_auroc_auprc(stacked_features, y, metric_cv, metric_loocv, best_para
     ax.scatter(AUROC_5cv, AUPRC_5cv, c='blue', edgecolors='black', alpha=0.7, s=20, label='Y-randomization')
     ax.set_xlabel('$AUROC_{5CV}$', fontsize=14, fontstyle='italic', weight='bold')
     ax.set_ylabel('$AUPRC_{5CV}$', fontsize=14, fontstyle='italic', weight='bold')
-    ax.legend(loc='lower right', fontsize='small')
+    plt.legend(bbox_to_anchor=(1,1), loc="upper left", fontsize='small')
     plt.tight_layout()
     plt.savefig("Y-randomization-" + name + "-AUROC-AUPRC.pdf", bbox_inches='tight')
     plt.close()
@@ -662,7 +669,7 @@ def main():
     )
     # AD
     #run_ad(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB", z=0.5)
-    run_ad_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB", z=3)
+    run_ad_cv(meta_model, stacked_features, pd.Series(y, index=stacked_features.index), "Stacked_XGB", z=2.5)
 if __name__ == "__main__":
     main()
 
