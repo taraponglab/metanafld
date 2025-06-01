@@ -1,0 +1,10 @@
+SubFP5	Alkene	[CX3;$([H2]),$([H1][#6]),$(C([#6])[#6])]=[CX3;$([H2]),$([H1][#6]),$(C([#6])[#6])]
+SubFP1	Primary carbon	[CX4H3][#6]
+SubFP13	Primary alcohol	[OX2H][CX4H2;!$(C([OX2H])[O,S,#7,#15])]
+SubFP137	Vinylogous ester	[#6X3](=[OX1])[#6X3]=,:[#6X3][#6;!$(C=[O,N,S])]
+SubFP18	Alkylarylether	[OX2](c)[CX4;!$(C([OX2])[O,S,#7,#15,F,Cl,Br,I])]
+SubFP84	Carboxylic acid	[CX3;$([R0][#6]),$([H1R0])](=[OX1])[$([OX2H]),$([OX1-])]
+SubFP2	Secondary carbon	[CX4H2]([#6])[#6]
+SubFP287	Conjugated double bond	*=*[*]=,#,:[*]
+SubFP275	Heterocyclic	[!#6;!R0]
+SubFP274	Aromatic	a
