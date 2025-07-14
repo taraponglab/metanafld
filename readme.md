@@ -75,7 +75,7 @@
   → `from revised folder/train.py import y_random_auroc_auprc`
   → `y_random_auroc_auprc(stacked_features, y, metric_cv, metric_loocv, best_params, 'Model_Name')`
   → Save to `revised folder/Y-randomization-Stacked_XGB-AUROC-AUPRC.pdf
-# Step 7 : SHAP analysis
+# Step 7: SHAP analysis
  → `from revised folder/highlight.py
  → `highlight_substructures(smiles, substructure_dict, compound_name="compound")
  → Save to `revised folder/molecules_highlight
